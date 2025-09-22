@@ -1,0 +1,79 @@
+{
+  "name": "cartao-simples-widget",
+  "version": "1.0.0",
+  "description": "Widget de pagamento white-label para o Cartão Simples - Parcele sem comprometer o limite do cartão",
+  "type": "module",
+  "main": "dist/sdk/index.js",
+  "module": "dist/sdk/index.es.js",
+  "types": "dist/sdk/index.d.ts",
+  "files": [
+    "dist/sdk",
+    "dist/cdn",
+    "dist/bootstrap",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "payment",
+    "widget",
+    "cartao-simples",
+    "white-label",
+    "checkout",
+    "ecommerce",
+    "react",
+    "typescript",
+    "brasil",
+    "fintech"
+  ],
+  "author": "Cartão Simples <dev@cartaosimples.com>",
+  "license": "MIT",
+  "homepage": "https://docs.cartaosimples.com/widget",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cartao-simples/widget.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cartao-simples/widget/issues"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:sdk && npm run build:cdn",
+    "build:sdk": "vite build --config vite.config.sdk.ts",
+    "build:cdn": "vite build --config vite.config.cdn.ts",
+    "build:bootstrap": "vite build --config vite.config.bootstrap.ts",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.0.0",
+    "lucide-react": "^0.544.0",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "react-hook-form": "^7.62.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.2",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.2",
+    "autoprefixer": "^10.4.20",
+    "tailwindcss": "^4.0.0",
+    "typescript": "~5.8.3",
+    "ultracite": "^5.3.6",
+    "vite": "^7.1.6"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  }
+}

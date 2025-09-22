@@ -1,0 +1,129 @@
+{
+  "CallerReference": "cartao-simples-widget-distribution",
+  "Comment": "CDN distribution for Cartão Simples Payment Widget",
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "cartao-simples-widget-origin",
+        "DomainName": "cartao-simples-widget.s3.amazonaws.com",
+        "S3OriginConfig": {
+          "OriginAccessIdentity": ""
+        }
+      }
+    ]
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "cartao-simples-widget-origin",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "MinTTL": 0,
+    "DefaultTTL": 86400,
+    "MaxTTL": 31536000,
+    "Compress": true,
+    "TrustedSigners": {
+      "Enabled": false,
+      "Quantity": 0
+    },
+    "ForwardedValues": {
+      "QueryString": false,
+      "Cookies": {
+        "Forward": "none"
+      },
+      "Headers": {
+        "Quantity": 1,
+        "Items": ["Origin"]
+      }
+    }
+  },
+  "CacheBehaviors": {
+    "Quantity": 2,
+    "Items": [
+      {
+        "PathPattern": "*.js",
+        "TargetOriginId": "cartao-simples-widget-origin",
+        "ViewerProtocolPolicy": "redirect-to-https",
+        "MinTTL": 0,
+        "DefaultTTL": 604800,
+        "MaxTTL": 31536000,
+        "Compress": true,
+        "TrustedSigners": {
+          "Enabled": false,
+          "Quantity": 0
+        },
+        "ForwardedValues": {
+          "QueryString": false,
+          "Cookies": {
+            "Forward": "none"
+          },
+          "Headers": {
+            "Quantity": 3,
+            "Items": [
+              "Origin",
+              "Access-Control-Request-Headers",
+              "Access-Control-Request-Method"
+            ]
+          }
+        }
+      },
+      {
+        "PathPattern": "*.css",
+        "TargetOriginId": "cartao-simples-widget-origin",
+        "ViewerProtocolPolicy": "redirect-to-https",
+        "MinTTL": 0,
+        "DefaultTTL": 604800,
+        "MaxTTL": 31536000,
+        "Compress": true,
+        "TrustedSigners": {
+          "Enabled": false,
+          "Quantity": 0
+        },
+        "ForwardedValues": {
+          "QueryString": false,
+          "Cookies": {
+            "Forward": "none"
+          },
+          "Headers": {
+            "Quantity": 3,
+            "Items": [
+              "Origin",
+              "Access-Control-Request-Headers",
+              "Access-Control-Request-Method"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "Enabled": true,
+  "PriceClass": "PriceClass_All",
+  "HttpVersion": "http2",
+  "IsIPV6Enabled": true,
+  "WebACLId": "",
+  "Aliases": {
+    "Quantity": 1,
+    "Items": ["cdn.cartaosimples.com"]
+  },
+  "ViewerCertificate": {
+    "CloudFrontDefaultCertificate": false,
+    "ACMCertificateArn": "arn:aws:acm:us-east-1:ACCOUNT_ID:certificate/CERTIFICATE_ID",
+    "SSLSupportMethod": "sni-only",
+    "MinimumProtocolVersion": "TLSv1.2_2021"
+  },
+  "CustomErrorResponses": {
+    "Quantity": 2,
+    "Items": [
+      {
+        "ErrorCode": 404,
+        "ResponsePagePath": "/404.html",
+        "ResponseCode": "404",
+        "ErrorCachingMinTTL": 300
+      },
+      {
+        "ErrorCode": 403,
+        "ResponsePagePath": "/404.html",
+        "ResponseCode": "404",
+        "ErrorCachingMinTTL": 300
+      }
+    ]
+  }
+}
