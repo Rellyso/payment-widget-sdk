@@ -118,33 +118,35 @@ export function PaymentWidget({ config, initialState }: PaymentWidgetProps) {
 
   return (
     <ThemeProvider config={config}>
-      <PaymentModal
-        isOpen={state.isOpen}
-        onClose={handleClose}
-        title="Cartão Simples"
-      >
-        <div className="p-6">
-          {/* Indicador de progresso */}
-          {/* <StepNavigation
+      <div className="payment-widget-root">
+        <PaymentModal
+          isOpen={state.isOpen}
+          onClose={handleClose}
+          title="Cartão Simples"
+        >
+          <div className="p-6">
+            {/* Indicador de progresso */}
+            {/* <StepNavigation
             currentStep={state.currentStep}
             steps={Object.values(WIDGET_STEPS)}
           /> */}
 
-          {/* Conteúdo do step atual */}
-          <div className="mt-6">{renderCurrentStep()}</div>
-        </div>
-      </PaymentModal>
+            {/* Conteúdo do step atual */}
+            <div className="mt-6">{renderCurrentStep()}</div>
+          </div>
+        </PaymentModal>
 
-      {/* API externa - pode ser usado para controle programático */}
-      {typeof window !== "undefined" && (
-        <div
-          ref={(el) => {
-            if (el && config.merchantId) {
-              (window as any)[`PaymentWidget_${config.merchantId}`] = api;
-            }
-          }}
-        />
-      )}
+        {/* API externa - pode ser usado para controle programático */}
+        {typeof window !== "undefined" && (
+          <div
+            ref={(el) => {
+              if (el && config.merchantId) {
+                (window as any)[`PaymentWidget_${config.merchantId}`] = api;
+              }
+            }}
+          />
+        )}
+      </div>
     </ThemeProvider>
   );
 }
@@ -164,26 +166,52 @@ function getCurrentStepDataKey(step: WidgetStep): string {
 
 // API para montagem externa (usado pelo bootstrap)
 export const mount = (container: HTMLElement, config: WidgetConfig) => {
-  const React = (window as any).React;
-  const ReactDOM = (window as any).ReactDOM;
+  // Usa React do bundle se disponível, senão tenta do window (fallback CDN)
+  const React = (window as any).React || require("react");
+  const ReactDOM = (window as any).ReactDOM || require("react-dom/client");
 
   if (!(React && ReactDOM)) {
     throw new Error(
-      "React e ReactDOM devem estar disponíveis no escopo global"
+      "React não está disponível. Use o bundle CDN completo ou carregue React manualmente."
     );
   }
 
   const root = ReactDOM.createRoot(container);
   root.render(React.createElement(PaymentWidget, { config }));
 
+  // Função helper para aguardar a API global estar disponível
+  const waitForApi = (merchantId: string): Promise<any> => {
+    return new Promise((resolve) => {
+      const checkApi = () => {
+        const globalApi = (window as any)[`PaymentWidget_${merchantId}`];
+        if (globalApi) {
+          resolve(globalApi);
+        } else {
+          setTimeout(checkApi, 10); // Tenta novamente em 10ms
+        }
+      };
+      checkApi();
+    });
+  };
+
   return {
-    open: () => {
-      // Implementar via eventos customizados ou estado global
+    open: async () => {
+      if (config.merchantId) {
+        const api = await waitForApi(config.merchantId);
+        api.open();
+      }
     },
-    close: () => {
-      // Implementar via eventos customizados ou estado global
+    close: async () => {
+      if (config.merchantId) {
+        const api = await waitForApi(config.merchantId);
+        api.close();
+      }
     },
     destroy: () => {
+      // Remove API global se existir
+      if (config.merchantId) {
+        delete (window as any)[`PaymentWidget_${config.merchantId}`];
+      }
       root.unmount();
     },
   };

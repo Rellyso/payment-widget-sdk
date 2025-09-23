@@ -5,6 +5,11 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "./src"),
+    },
+  },
   build: {
     outDir: "dist/cdn",
     lib: {
@@ -14,8 +19,11 @@ export default defineConfig({
       formats: ["umd"],
     },
     rollupOptions: {
+      // Remove React das externals para incluí-lo no bundle
+      external: [], // Vazio para incluir todas as dependências
       output: {
         inlineDynamicImports: true,
+        globals: {}, // Vazio pois não temos externals
       },
     },
     minify: "terser",

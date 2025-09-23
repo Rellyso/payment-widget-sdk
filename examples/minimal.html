@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Minimal Test</title>
+  <link rel="stylesheet" href="../dist/cdn/widget.v1.min.css">
+</head>
+
+<body>
+  <h1>Minimal Widget Test</h1>
+  <div id="widget"></div>
+  <button onclick="mount()">Mount</button>
+  <button onclick="open()">Open</button>
+
+  <script src="../dist/cdn/widget.v1.min.umd.cjs"></script>
+  <script>
+    let widget;
+
+    function mount() {
+      console.log('Mounting...');
+      widget = CartaoSimplesWidget.mount(document.getElementById('widget'), {
+        merchantId: 'test'
+      });
+      console.log('Mounted:', widget);
+    }
+
+    function open() {
+      console.log('Opening...');
+      if (widget) {
+        widget.open();
+      } else {
+        alert('Mount first!');
+      }
+    }
+  </script>
+</body>
+
+</html>

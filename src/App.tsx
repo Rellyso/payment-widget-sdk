@@ -8,10 +8,12 @@ function App() {
 
   const widgetConfig: WidgetConfig = {
     merchantId: "demo-merchant-123",
-    primaryColor: "#ff6600",
-    secondaryColor: "#0a0a0a",
+    theme: {
+      primaryColor: "#ff6600",
+      secondaryColor: "#0a0a0a",
+      borderRadius: "md",
+    },
     logoUrl: "https://www.cartaosimples.com.br/logo-extendida.svg",
-    borderRadius: "md",
     environment: "staging",
     onSuccess: (data) => {
       console.log("Pagamento realizado com sucesso:", data);

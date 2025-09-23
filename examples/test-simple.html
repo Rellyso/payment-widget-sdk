@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Widget CDN</title>
+  <link rel="stylesheet" href="../dist/cdn/widget.v1.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+
+    #container {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      margin: 20px 0;
+      min-height: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Test Widget</h1>
+
+  <div id="container">
+    <p>Widget container</p>
+  </div>
+
+  <button onclick="testMount()">Mount Widget</button>
+  <button onclick="testOpen()">Open</button>
+  <button onclick="testClose()">Close</button>
+
+  <script src="../dist/cdn/widget.v1.min.umd.cjs"></script>
+
+  <script>
+    let widget = null;
+
+    console.log('API disponível:', !!window.CartaoSimplesWidget);
+
+    function testMount() {
+      console.log('Mounting widget...');
+      const container = document.getElementById('container');
+
+      try {
+        widget = CartaoSimplesWidget.mount(container, {
+          merchantId: 'test123',
+          onOpen: () => console.log('Widget opened'),
+          onClose: () => console.log('Widget closed'),
+          onError: (err) => console.error('Widget error:', err)
+        });
+        console.log('Widget mounted:', widget);
+        container.style.border = '2px solid green';
+      } catch (error) {
+        console.error('Mount error:', error);
+        container.innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+      }
+    }
+
+    function testOpen() {
+      console.log('Opening widget...');
+      if (widget) {
+        widget.open();
+      } else {
+        alert('Mount widget first!');
+      }
+    }
+
+    function testClose() {
+      console.log('Closing widget...');
+      if (widget) {
+        widget.close();
+      } else {
+        alert('Mount widget first!');
+      }
+    }
+  </script>
+</body>
+
+</html>

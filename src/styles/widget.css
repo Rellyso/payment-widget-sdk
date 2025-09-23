@@ -1,18 +1,17 @@
 @import "tailwindcss";
-
-@plugin "tailwindcss-animate";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
+@plugin "tailwindcss-animate";
+
 /* CSS Variables para White-label theming */
 :root {
-  --pw-primary: #ff6600;
-  --pw-secondary: #0a0a0a;
-  --pw-border-radius: 12px;
-  --pw-logo-url: "";
-  --pw-font-family: system-ui, -apple-system, sans-serif;
-  --pw-shadow:
+  --primary: #ff6600;
+  --secondary: #0a0a0a;
+  --border-radius: 12px;
+  --font-family: system-ui, -apple-system, sans-serif;
+  --shadow:
     0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -50,7 +49,7 @@
 
 /* Base styles para o widget */
 .payment-widget {
-  font-family: var(--pw-font-family);
+  font-family: var(--font-family);
   color-scheme: light;
   --primary: var(--pw-primary);
   --secondary: var(--pw-secondary);

@@ -1,0 +1,285 @@
+/* Reset e base styles */
+.payment-widget-root {
+  all: initial;
+  font-family:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  color: #111827;
+}
+
+.payment-widget-root *,
+.payment-widget-root *::before,
+.payment-widget-root *::after {
+  box-sizing: border-box;
+}
+
+/* Utility classes */
+.pw-flex {
+  display: flex;
+}
+.pw-inline-flex {
+  display: inline-flex;
+}
+.pw-items-center {
+  align-items: center;
+}
+.pw-justify-center {
+  justify-content: center;
+}
+.pw-justify-between {
+  justify-content: space-between;
+}
+.pw-justify-end {
+  justify-content: flex-end;
+}
+.pw-space-y-4 > * + * {
+  margin-top: 1rem;
+}
+.pw-space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Spacing */
+.pw-p-2 {
+  padding: 0.5rem;
+}
+.pw-p-4 {
+  padding: 1rem;
+}
+.pw-p-6 {
+  padding: 1.5rem;
+}
+.pw-px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.pw-py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.pw-ml-3 {
+  margin-left: 0.75rem;
+}
+.pw-mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+/* Typography */
+.pw-text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.pw-text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.pw-text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+.pw-font-medium {
+  font-weight: 500;
+}
+.pw-font-semibold {
+  font-weight: 600;
+}
+
+/* Colors */
+.pw-text-gray-600 {
+  color: #4b5563;
+}
+.pw-text-gray-700 {
+  color: #374151;
+}
+.pw-text-gray-900 {
+  color: #111827;
+}
+.pw-text-white {
+  color: #ffffff;
+}
+.pw-bg-white {
+  background-color: #ffffff;
+}
+.pw-bg-blue-600 {
+  background-color: #2563eb;
+}
+.pw-bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+/* Borders */
+.pw-border {
+  border: 1px solid #d1d5db;
+}
+.pw-border-gray-300 {
+  border-color: #d1d5db;
+}
+.pw-rounded {
+  border-radius: 0.25rem;
+}
+.pw-rounded-md {
+  border-radius: 0.375rem;
+}
+
+/* Sizing */
+.pw-h-4 {
+  height: 1rem;
+}
+.pw-h-5 {
+  height: 1.25rem;
+}
+.pw-w-4 {
+  width: 1rem;
+}
+.pw-w-5 {
+  width: 1.25rem;
+}
+.pw-w-full {
+  width: 100%;
+}
+
+/* Button styles */
+.pw-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.pw-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.pw-button-primary {
+  background-color: #2563eb;
+  color: white;
+}
+
+.pw-button-primary:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.pw-button-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Input styles */
+.pw-input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+}
+
+.pw-input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-color: #3b82f6;
+}
+
+.pw-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Checkbox styles */
+.pw-checkbox {
+  height: 1rem;
+  width: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+  accent-color: #2563eb;
+}
+
+.pw-checkbox:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Label styles */
+.pw-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+/* Form group */
+.pw-form-group {
+  margin-bottom: 1rem;
+}
+
+/* Relative positioning */
+.pw-relative {
+  position: relative;
+}
+
+/* Flex items */
+.pw-flex-items-start {
+  align-items: flex-start;
+}
+
+/* Animations (já definidas no CSS anterior) */
+@keyframes pw-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pw-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading spinner */
+.pw-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f4f6;
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error styles */
+.pw-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Success styles */
+.pw-success {
+  color: #059669;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}

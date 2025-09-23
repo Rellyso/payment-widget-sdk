@@ -2,17 +2,21 @@ export type WidgetConfig = {
   /** ID único do merchant/parceiro */
   merchantId: string;
 
-  /** Cores primária (hex) */
-  primaryColor?: string;
+  /** Chave da API do merchant */
+  apiKey?: string;
 
-  /** Cor secundária (hex) */
-  secondaryColor?: string;
+  /** Configurações de tema */
+  theme?: {
+    /** Cores primária (hex) */
+    primaryColor?: string;
+    /** Cor secundária (hex) */
+    secondaryColor?: string;
+    /** Border radius (sm|md|lg|full|px) */
+    borderRadius?: "sm" | "md" | "lg" | "full" | string;
+  };
 
   /** URL do logo do parceiro */
   logoUrl?: string;
-
-  /** Border radius (sm|md|lg|full|px) */
-  borderRadius?: "sm" | "md" | "lg" | "full" | string;
 
   /** Localização */
   locale?: "pt-BR";
