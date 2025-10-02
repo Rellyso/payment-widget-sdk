@@ -92,6 +92,7 @@ export type WidgetStep = (typeof WIDGET_STEPS)[keyof typeof WIDGET_STEPS];
 
 export type WidgetState = {
   isOpen: boolean;
+  isLoaded: boolean;
   currentStep: WidgetStep;
   isLoading: boolean;
   creditAnalysis?: CreditAnalysisData;
@@ -109,11 +110,24 @@ export type WidgetAPI = {
   getState: () => WidgetState;
 };
 
+/** API simplificada retornada pelo método mount do CDN */
+export type WidgetInstance = {
+  open: () => void;
+  close: () => void;
+  destroy: () => void;
+  getState: () => Pick<WidgetState, "isOpen">;
+};
+
+/** API do CDN com método mount */
+export type CDNWidgetAPI = {
+  mount: (container: HTMLElement, config: WidgetConfig) => WidgetInstance;
+};
+
 declare global {
   // biome-ignore lint/nursery/useConsistentTypeDefinitions: global Window interface extension
   interface Window {
     PaymentWidget?: WidgetAPI;
-    CartaoSimplesWidget?: WidgetAPI;
+    CartaoSimplesWidget?: CDNWidgetAPI;
     PaymentWidgetInit?: WidgetConfig;
   }
 }

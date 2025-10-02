@@ -18,6 +18,7 @@ Bem-vindo à documentação completa do Payment Widget! Aqui você encontra tudo
 ### 🧪 Desenvolvimento e Testes
 
 - **[Servidor Local](./SERVIDOR-LOCAL.md)** - Como testar localmente com HTTP server
+- **[Verificar Shadow DOM](./VERIFICAR-SHADOW-DOM.md)** - Como verificar se o Shadow DOM está funcionando
 - **[Resumo Visual](./RESUMO-VISUAL.md)** - Status, métricas e checklist do projeto
 
 ### 📋 Referência Completa

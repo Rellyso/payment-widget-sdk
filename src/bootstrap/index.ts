@@ -4,31 +4,37 @@
  * Lê configurações via data-* attributes e inicializa o widget
  */
 
-import type { WidgetAPI, WidgetConfig } from "../types";
+import type {
+  WidgetInstance as CDNWidgetInstance,
+  WidgetConfig,
+  WidgetState,
+} from "../types";
 import { logger } from "../utils/logger";
 
 type BootstrapState = {
-  instances: Map<string, WidgetInstance>;
+  instances: Map<string, InternalWidgetInstance>;
   isLoaded: boolean;
   loadPromise: Promise<void> | null;
 };
 
-type WidgetInstance = {
+type InternalWidgetInstance = {
   config: WidgetConfig;
   container: HTMLElement;
   shadowRoot: ShadowRoot | null;
-  api: WidgetAPI | null;
+  api: CDNWidgetInstance | null;
 };
 
+// URLs do CDN (CloudFront para production)
 const CDN_BASE_URL = "https://d2x7cg3k3on9lk.cloudfront.net";
 const WIDGET_BUNDLE_URL = `${CDN_BASE_URL}/widget.v1.min.js`;
+const WIDGET_CSS_URL = `${CDN_BASE_URL}/widget.v1.min.css`;
 const CONTAINER_ID_PREFIX = "__payment_widget_root__";
 const ROOT_ELEMENT_ID = "pw-root";
 const RETRY_DELAY_MS = 100;
 const MAX_RETRIES = 50;
 
 class PaymentWidgetBootstrap {
-  private state: BootstrapState = {
+  private readonly state: BootstrapState = {
     instances: new Map(),
     isLoaded: false,
     loadPromise: null,
@@ -59,7 +65,7 @@ class PaymentWidgetBootstrap {
       const shadowRoot = this.createShadowDOM(container);
 
       // Cria instância
-      const instance: WidgetInstance = {
+      const instance: InternalWidgetInstance = {
         config,
         container,
         shadowRoot,
@@ -113,6 +119,9 @@ class PaymentWidgetBootstrap {
       return;
     }
 
+    // Habilita interação com o container
+    instance.container.style.pointerEvents = "auto";
+
     instance.api.open();
   }
 
@@ -122,11 +131,16 @@ class PaymentWidgetBootstrap {
   close(merchantId?: string): void {
     const targetMerchantId = merchantId || this.getFirstMerchantId();
 
-    if (!targetMerchantId) return;
+    if (!targetMerchantId) {
+      return;
+    }
 
     const instance = this.state.instances.get(targetMerchantId);
     if (instance?.api) {
       instance.api.close();
+      
+      // Desabilita interação com o container após fechar
+      instance.container.style.pointerEvents = "none";
     }
   }
 
@@ -136,7 +150,9 @@ class PaymentWidgetBootstrap {
   destroy(merchantId?: string): void {
     const targetMerchantId = merchantId || this.getFirstMerchantId();
 
-    if (!targetMerchantId) return;
+    if (!targetMerchantId) {
+      return;
+    }
 
     const instance = this.state.instances.get(targetMerchantId);
     if (instance) {
@@ -176,7 +192,6 @@ class PaymentWidgetBootstrap {
       width: 100vw;
       height: 100vh;
       z-index: 999999;
-      display: none;
       pointer-events: none;
     `;
 
@@ -192,6 +207,13 @@ class PaymentWidgetBootstrap {
       // Tenta criar Shadow DOM
       if (container.attachShadow) {
         const shadowRoot = container.attachShadow({ mode: "open" });
+
+        // Injeta CSS no Shadow DOM
+        const style = document.createElement("link");
+        style.rel = "stylesheet";
+        style.href = WIDGET_CSS_URL;
+        style.crossOrigin = "anonymous";
+        shadowRoot.appendChild(style);
 
         // Cria div root dentro do shadow
         const rootDiv = document.createElement("div");
@@ -237,8 +259,10 @@ class PaymentWidgetBootstrap {
   /**
    * Carrega o bundle da UI assincronamente
    */
-  private async loadUIBundle(): Promise<void> {
-    if (this.state.isLoaded) return;
+  private loadUIBundle(): Promise<void> {
+    if (this.state.isLoaded) {
+      return Promise.resolve();
+    }
 
     if (this.state.loadPromise) {
       return this.state.loadPromise;
@@ -275,13 +299,14 @@ class PaymentWidgetBootstrap {
   /**
    * Inicializa a UI do widget
    */
-  private async initializeUI(instance: WidgetInstance): Promise<any> {
+  private async initializeUI(
+    instance: InternalWidgetInstance
+  ): Promise<CDNWidgetInstance> {
     // Aguarda o bundle estar disponível
     let retries = 0;
-    const maxRetries = 50; // 5 segundos
 
-    while (!window.CartaoSimplesWidget && retries < maxRetries) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+    while (!window.CartaoSimplesWidget && retries < MAX_RETRIES) {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
       retries++;
     }
 
@@ -293,7 +318,11 @@ class PaymentWidgetBootstrap {
     let rootElement: HTMLElement;
 
     if (instance.shadowRoot) {
-      rootElement = instance.shadowRoot.getElementById(ROOT_ELEMENT_ID);
+      const shadowElement = instance.shadowRoot.getElementById(ROOT_ELEMENT_ID);
+      if (!shadowElement) {
+        throw new Error("Elemento root não encontrado no Shadow DOM");
+      }
+      rootElement = shadowElement;
     } else {
       // Para iframe fallback
       const iframe = instance.container.querySelector("iframe");
@@ -307,8 +336,22 @@ class PaymentWidgetBootstrap {
     // Aplica tema white-label via CSS variables
     this.applyTheme(rootElement, instance.config);
 
+    // Cria config modificado com callback de close interceptado
+    const wrappedConfig = {
+      ...instance.config,
+      onClose: () => {
+        // Desabilita pointer-events quando o modal fecha
+        instance.container.style.pointerEvents = "none";
+        
+        // Chama callback original se existir
+        if (instance.config.onClose) {
+          instance.config.onClose();
+        }
+      },
+    };
+
     // Monta o componente React
-    return window.CartaoSimplesWidget.mount(rootElement, instance.config);
+    return window.CartaoSimplesWidget.mount(rootElement, wrappedConfig);
   }
 
   /**
@@ -317,20 +360,20 @@ class PaymentWidgetBootstrap {
   private applyTheme(element: HTMLElement, config: WidgetConfig): void {
     const style = element.style || document.documentElement.style;
 
-    if (config.primaryColor) {
-      style.setProperty("--pw-primary", config.primaryColor);
+    if (config.theme?.primaryColor) {
+      style.setProperty("--pw-primary", config.theme.primaryColor);
     }
 
-    if (config.secondaryColor) {
-      style.setProperty("--pw-secondary", config.secondaryColor);
+    if (config.theme?.secondaryColor) {
+      style.setProperty("--pw-secondary", config.theme.secondaryColor);
     }
 
     if (config.logoUrl) {
       style.setProperty("--pw-logo-url", `url(${config.logoUrl})`);
     }
 
-    if (config.borderRadius) {
-      const borderRadius = this.parseBorderRadius(config.borderRadius);
+    if (config.theme?.borderRadius) {
+      const borderRadius = this.parseBorderRadius(config.theme.borderRadius);
       style.setProperty("--pw-border-radius", borderRadius);
     }
   }
@@ -355,6 +398,39 @@ class PaymentWidgetBootstrap {
   private getFirstMerchantId(): string | undefined {
     return Array.from(this.state.instances.keys())[0];
   }
+
+  /**
+   * Obtém o estado público do widget
+   */
+  getState(): WidgetState {
+    const firstMerchantId = this.getFirstMerchantId();
+    const instance = firstMerchantId
+      ? this.state.instances.get(firstMerchantId)
+      : null;
+
+    // Obtém estado da API do widget
+    let isOpen = false;
+    if (instance?.api?.getState) {
+      try {
+        const apiState = instance.api.getState();
+        isOpen = apiState?.isOpen ?? false;
+      } catch (error) {
+        logger.warn("Erro ao obter estado da API:", error);
+      }
+    }
+
+    return {
+      isLoaded: this.state.isLoaded,
+      isOpen,
+      isLoading: false,
+      currentStep: "authorization",
+      creditAnalysis: undefined,
+      address: undefined,
+      payment: undefined,
+      isApproved: undefined,
+      error: undefined,
+    };
+  }
 }
 
 // Instância global
@@ -366,7 +442,7 @@ window.PaymentWidget = {
   open: (merchantId?: string) => bootstrap.open(merchantId),
   close: (merchantId?: string) => bootstrap.close(merchantId),
   destroy: (merchantId?: string) => bootstrap.destroy(merchantId),
-  getState: () => ({ isLoaded: bootstrap["state"].isLoaded }),
+  getState: () => bootstrap.getState(),
 };
 
 // Auto-inicialização via data attributes ou window.PaymentWidgetInit
@@ -396,10 +472,17 @@ function extractConfigFromDataAttributes(
 
   return {
     merchantId: dataset.merchantId || "",
-    primaryColor: dataset.primary || dataset.primaryColor,
-    secondaryColor: dataset.secondary || dataset.secondaryColor,
+    theme: {
+      primaryColor: dataset.primary || dataset.primaryColor,
+      secondaryColor: dataset.secondary || dataset.secondaryColor,
+      borderRadius: dataset.borderRadius as
+        | "sm"
+        | "md"
+        | "lg"
+        | "full"
+        | undefined,
+    },
     logoUrl: dataset.logo || dataset.logoUrl,
-    borderRadius: dataset.borderRadius,
     environment: (dataset.env || dataset.environment) as
       | "staging"
       | "production",

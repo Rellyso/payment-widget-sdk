@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Teste Staging S3 - Payment Widget</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      margin-bottom: 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      color: #718096;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .info-box {
+      background: #f7fafc;
+      border-left: 4px solid #667eea;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .info-box h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 8px;
+    }
+
+    .info-box p {
+      font-size: 13px;
+      color: #4a5568;
+      line-height: 1.5;
+    }
+
+    .info-box code {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 12px;
+      color: #667eea;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    button {
+      flex: 1;
+      min-width: 200px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 16px 28px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background: #cbd5e0;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    button.secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    button.secondary:hover:not(:disabled) {
+      background: #f7fafc;
+    }
+
+    .log-container {
+      background: #1a202c;
+      border-radius: 12px;
+      padding: 24px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    .log-title {
+      color: #e2e8f0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .log-clear {
+      background: #2d3748;
+      color: #e2e8f0;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .log-clear:hover {
+      background: #4a5568;
+    }
+
+    .log-content {
+      font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .log-entry:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .log-entry.success {
+      color: #68d391;
+    }
+
+    .log-entry.error {
+      color: #fc8181;
+    }
+
+    .log-entry.warning {
+      color: #f6ad55;
+    }
+
+    .log-entry.info {
+      color: #63b3ed;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-indicator.success {
+      background: #68d391;
+    }
+
+    .status-indicator.error {
+      background: #fc8181;
+    }
+
+    .status-indicator.warning {
+      background: #f6ad55;
+    }
+
+    .status-indicator.info {
+      background: #63b3ed;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .loading {
+      animation: pulse 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="badge">🧪 STAGING ENVIRONMENT</div>
+        <h1>Payment Widget - Teste S3 Direto</h1>
+        <p class="subtitle">
+          Testando direto do bucket S3 staging (sem CloudFront)<br>
+          <strong>Timestamp:</strong> <span id="timestamp"></span>
+        </p>
+      </div>
+
+      <div class="info-box">
+        <h3>📦 Configuração</h3>
+        <p>
+          • Bootstrap URL:
+          <code>https://cartao-simples-widget-staging.s3.us-east-1.amazonaws.com/widget-bootstrap.v1.min.js</code><br>
+          • Bundle URL:
+          <code>https://cartao-simples-widget-staging.s3.us-east-1.amazonaws.com/widget.v1.min.js</code><br>
+          • Environment: <code>staging</code> (detectado automaticamente)
+        </p>
+      </div>
+
+      <div class="controls">
+        <button id="btn-init" onclick="initWidget()">
+          1. 🚀 Inicializar Widget
+        </button>
+        <button id="btn-open" onclick="openModal()" disabled>
+          2. 📖 Abrir Modal
+        </button>
+        <button id="btn-close" onclick="closeModal()" disabled>
+          3. 📕 Fechar Modal
+        </button>
+      </div>
+
+      <div class="controls">
+        <button class="secondary" id="btn-inspect" onclick="inspectContainer()" disabled>
+          🔍 Inspecionar DOM
+        </button>
+        <button class="secondary" onclick="testState()">
+          📊 Verificar Estado
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="log-container">
+        <div class="log-header">
+          <div class="log-title">📊 Console de Debug</div>
+          <button class="log-clear" onclick="clearLog()">🗑️ Limpar</button>
+        </div>
+        <div id="console" class="log-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // IMPORTANTE: Define ambiente ANTES de carregar o bootstrap
+    window.__WIDGET_ENV = 'staging';
+
+    let widgetInitialized = false;
+
+    // Atualiza timestamp
+    document.getElementById('timestamp').textContent = new Date().toISOString();
+
+    function log(message, type = 'info') {
+      const logContainer = document.getElementById('console');
+      const timestamp = new Date().toLocaleTimeString('pt-BR', { hour12: false, fractionalSecondDigits: 3 });
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+
+      const indicator = document.createElement('span');
+      indicator.className = `status-indicator ${type}`;
+
+      entry.appendChild(indicator);
+      entry.appendChild(document.createTextNode(`[${timestamp}] ${message}`));
+
+      logContainer.appendChild(entry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+
+      // Log no console do browser também
+      const consoleMethod = type === 'error' ? 'error' : type === 'warning' ? 'warn' : 'log';
+      window.console[consoleMethod](`[Widget] ${message}`);
+    }
+
+    function clearLog() {
+      document.getElementById('console').innerHTML = '';
+      log('Console limpo', 'info');
+    }
+
+    async function initWidget() {
+      log('🚀 Iniciando inicialização...', 'info');
+      document.getElementById('btn-init').disabled = true;
+
+      try {
+        // Verifica se variável de ambiente foi setada
+        log(`✅ Ambiente configurado: ${window.__WIDGET_ENV}`, 'success');
+
+        if (window.PaymentWidget) {
+          log('⚠️ Bootstrap já carregado (possivelmente cache)', 'warning');
+        } else {
+          log('📥 Carregando bootstrap do S3 staging...', 'info');
+          const bootstrapUrl = 'https://cartao-simples-widget-staging.s3.us-east-1.amazonaws.com/widget-bootstrap.v1.min.js';
+          log(`📍 URL: ${bootstrapUrl}`, 'info');
+
+          const script = document.createElement('script');
+          script.src = `${bootstrapUrl}?v=${Date.now()}`;
+          script.async = true;
+
+          await new Promise((resolve, reject) => {
+            script.onload = () => {
+              log('✅ Bootstrap carregado com sucesso!', 'success');
+              resolve();
+            };
+            script.onerror = (err) => {
+              log('❌ Erro ao carregar bootstrap', 'error');
+              reject(new Error('Falha ao carregar bootstrap'));
+            };
+            document.head.appendChild(script);
+          });
+        }
+
+        // Verifica se PaymentWidget foi registrado
+        if (!window.PaymentWidget) {
+          throw new Error('window.PaymentWidget não foi registrado!');
+        }
+        log('✅ window.PaymentWidget disponível', 'success');
+
+        log('🔧 Inicializando widget...', 'info');
+        await window.PaymentWidget.init({
+          merchantId: `staging_test_${Date.now()}`,
+          environment: 'staging',
+          theme: {
+            primaryColor: '#667eea',
+            secondaryColor: '#764ba2'
+          },
+          onOpen: () => {
+            log('🎉 Callback: Modal abriu!', 'success');
+            document.getElementById('btn-open').disabled = true;
+            document.getElementById('btn-close').disabled = false;
+            setTimeout(() => inspectContainer(), 200);
+          },
+          onClose: () => {
+            log('👋 Callback: Modal fechou!', 'info');
+            document.getElementById('btn-open').disabled = false;
+            document.getElementById('btn-close').disabled = true;
+            setTimeout(() => inspectContainer(), 200);
+          },
+          onError: (error) => {
+            log(`💥 Erro no widget: ${error.message}`, 'error');
+            console.error('Erro completo:', error);
+          }
+        });
+
+        widgetInitialized = true;
+        log('✅ Widget inicializado com sucesso!', 'success');
+
+        document.getElementById('btn-open').disabled = false;
+        document.getElementById('btn-inspect').disabled = false;
+
+        // Auto-inspeciona
+        setTimeout(() => {
+          log('🔍 Auto-inspeção pós-init...', 'info');
+          inspectContainer();
+        }, 500);
+
+      } catch (error) {
+        log(`❌ ERRO: ${error.message}`, 'error');
+        console.error('Stack trace:', error);
+        document.getElementById('btn-init').disabled = false;
+      }
+    }
+
+    function openModal() {
+      if (!widgetInitialized) {
+        log('⚠️ Widget não inicializado!', 'warning');
+        return;
+      }
+
+      log('📖 Abrindo modal...', 'info');
+
+      const stateBefore = window.PaymentWidget.getState();
+      log(`📊 Estado ANTES: isOpen=${stateBefore.isOpen}, isLoaded=${stateBefore.isLoaded}`, 'info');
+
+      window.PaymentWidget.open();
+
+      setTimeout(() => {
+        const stateAfter = window.PaymentWidget.getState();
+        log(`📊 Estado DEPOIS: isOpen=${stateAfter.isOpen}`, 'info');
+
+        if (stateAfter.isOpen === true) {
+          log('✅ Modal abriu corretamente!', 'success');
+        } else if (stateAfter.isOpen === false) {
+          log('❌ Modal NÃO abriu!', 'error');
+        } else {
+          log(`⚠️ Estado indefinido: ${stateAfter.isOpen}`, 'warning');
+        }
+
+        inspectContainer();
+      }, 150);
+    }
+
+    function closeModal() {
+      if (!widgetInitialized) {
+        log('⚠️ Widget não inicializado!', 'warning');
+        return;
+      }
+
+      log('📕 Fechando modal...', 'info');
+      window.PaymentWidget.close();
+
+      setTimeout(() => testState(), 150);
+    }
+
+    function testState() {
+      if (!widgetInitialized) {
+        log('⚠️ Widget não inicializado!', 'warning');
+        return;
+      }
+
+      const state = window.PaymentWidget.getState();
+      log('━━━━━ 📊 Estado Atual ━━━━━', 'info');
+      log(`  isLoaded: ${state.isLoaded}`, state.isLoaded ? 'success' : 'error');
+      log(`  isOpen: ${state.isOpen}`, state.isOpen ? 'success' : 'info');
+      log(`  merchantId: ${state.merchantId || 'N/A'}`, 'info');
+      log('━━━━━━━━━━━━━━━━━━━━━━━━━━', 'info');
+    }
+
+    function inspectContainer() {
+      if (!widgetInitialized) {
+        log('⚠️ Nada para inspecionar', 'warning');
+        return;
+      }
+
+      log('━━━━━ 🔬 Inspeção DOM ━━━━━', 'info');
+
+      const containers = document.querySelectorAll('[id^="__payment_widget_root__"]');
+
+      if (containers.length === 0) {
+        log('❌ Container não encontrado!', 'error');
+        return;
+      }
+
+      log(`✅ ${containers.length} container(s) encontrado(s)`, 'success');
+
+      containers.forEach((container, i) => {
+        const styles = window.getComputedStyle(container);
+
+        log(`\n📦 Container #${i + 1}: ${container.id}`, 'info');
+        log(`  position: ${styles.position}`, 'info');
+        log(`  display: ${styles.display || '(padrão)'}`,
+          styles.display === 'none' ? 'error' : 'success');
+        log(`  pointer-events: ${styles.pointerEvents}`,
+          styles.pointerEvents === 'auto' ? 'success' : 'warning');
+        log(`  z-index: ${styles.zIndex}`, 'info');
+        log(`  visibility: ${styles.visibility}`, 'info');
+
+        if (container.shadowRoot) {
+          log(`✅ Shadow DOM presente (${container.shadowRoot.mode})`, 'success');
+
+          const root = container.shadowRoot.querySelector('#pw-root');
+          if (root) {
+            log(`✅ #pw-root encontrado (${root.children.length} children)`, 'success');
+
+            // Procura modal/overlay
+            const modal = container.shadowRoot.querySelector('[data-state], [role="dialog"], .modal-overlay');
+            if (modal) {
+              const modalStyles = window.getComputedStyle(modal);
+              log(`✅ Modal encontrado:`, 'success');
+              log(`  display: ${modalStyles.display}`, 'info');
+              log(`  opacity: ${modalStyles.opacity}`, 'info');
+              log(`  data-state: ${modal.getAttribute('data-state') || 'N/A'}`, 'info');
+            } else {
+              log(`⚠️ Modal/overlay não encontrado`, 'warning');
+            }
+          } else {
+            log(`❌ #pw-root NÃO encontrado`, 'error');
+          }
+        } else {
+          log(`❌ Shadow DOM NÃO existe!`, 'error');
+        }
+      });
+
+      log('━━━━━━━━━━━━━━━━━━━━━━━━━━', 'info');
+    }
+
+    // Log inicial
+    log('✅ Página carregada', 'success');
+    log('🌐 Ambiente: STAGING (S3 direto)', 'info');
+    log('⚙️ window.__WIDGET_ENV = ' + window.__WIDGET_ENV, 'success');
+    log('👉 Clique em "Inicializar Widget" para começar', 'info');
+  </script>
+</body>
+
+</html>

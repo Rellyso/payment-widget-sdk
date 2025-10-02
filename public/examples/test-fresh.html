@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Fresh - Payment Widget</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    button {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #1976D2;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .log {
+      background: #263238;
+      color: #aed581;
+      padding: 20px;
+      border-radius: 6px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 4px 0;
+    }
+
+    .log-entry.success {
+      color: #81c784;
+    }
+
+    .log-entry.error {
+      color: #e57373;
+    }
+
+    .log-entry.warning {
+      color: #ffb74d;
+    }
+
+    .log-entry.info {
+      color: #64b5f6;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .status.ok {
+      background: #c8e6c9;
+      color: #2e7d32;
+    }
+
+    .status.fail {
+      background: #ffcdd2;
+      color: #c62828;
+    }
+
+    .status.pending {
+      background: #fff9c4;
+      color: #f57f17;
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>🧪 Teste Fresh - Payment Widget</h1>
+    <p class="subtitle">Deploy: <code>2 out 2025 10:09 UTC</code> • CloudFront Invalidation:
+      <code>ID8KFCQS5MU0O76ZJZGMFEDUJP</code></p>
+
+    <div style="margin-bottom: 20px;">
+      <button id="btn-init" onclick="initWidget()">1. Inicializar Widget</button>
+      <button id="btn-open" onclick="openModal()" disabled>2. Abrir Modal</button>
+      <button id="btn-close" onclick="closeModal()" disabled>3. Fechar Modal</button>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <button id="btn-inspect" onclick="inspectContainer()" disabled>🔍 Inspecionar Container</button>
+      <button onclick="clearLog()">🗑️ Limpar Console</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Console de Debug</h2>
+    <div id="console" class="log"></div>
+  </div>
+
+  <script>
+    let widgetInitialized = false;
+
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const timestamp = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+
+      // Emojis por tipo
+      const emoji = {
+        info: 'ℹ️',
+        success: '✅',
+        error: '❌',
+        warning: '⚠️'
+      }[type] || '';
+
+      entry.textContent = `[${timestamp}] ${emoji} ${message}`;
+      console.appendChild(entry);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('console').innerHTML = '';
+      log('Console limpo', 'info');
+    }
+
+    async function initWidget() {
+      log('🚀 Iniciando inicialização do widget...', 'info');
+      document.getElementById('btn-init').disabled = true;
+
+      try {
+        // Força reload do script com timestamp
+        if (window.PaymentWidget) {
+          log('⚠️ Bootstrap já estava carregado, vai usar existente', 'warning');
+        } else {
+          log('📥 Carregando bootstrap do CloudFront (fresh)...', 'info');
+          const script = document.createElement('script');
+          // Adiciona cache-bust para garantir versão mais recente
+          script.src = `https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js?v=${Date.now()}`;
+          script.async = true;
+
+          await new Promise((resolve, reject) => {
+            script.onload = () => {
+              log('✅ Script do bootstrap carregado', 'success');
+              resolve();
+            };
+            script.onerror = () => reject(new Error('Falha ao carregar bootstrap'));
+            document.head.appendChild(script);
+          });
+        }
+
+        log('🔧 Chamando PaymentWidget.init()...', 'info');
+
+        // Inicializa o widget
+        await window.PaymentWidget.init({
+          merchantId: 'test_fresh_' + Date.now(),
+          environment: 'staging',
+          theme: {
+            primaryColor: '#2196F3',
+            secondaryColor: '#4CAF50'
+          },
+          onOpen: () => {
+            log('🎉 Callback onOpen disparado!', 'success');
+            document.getElementById('btn-open').disabled = true;
+            document.getElementById('btn-close').disabled = false;
+            inspectContainer();
+          },
+          onClose: () => {
+            log('👋 Callback onClose disparado!', 'info');
+            document.getElementById('btn-open').disabled = false;
+            document.getElementById('btn-close').disabled = true;
+            inspectContainer();
+          },
+          onError: (error) => {
+            log(`💥 Erro: ${error.message}`, 'error');
+            console.error('Erro completo:', error);
+          }
+        });
+
+        widgetInitialized = true;
+        log('✅ Widget inicializado com sucesso!', 'success');
+        document.getElementById('btn-open').disabled = false;
+        document.getElementById('btn-inspect').disabled = false;
+
+        // Inspeciona automaticamente
+        setTimeout(() => {
+          log('🔍 Auto-inspeção após init...', 'info');
+          inspectContainer();
+        }, 500);
+
+      } catch (error) {
+        log(`❌ Erro ao inicializar: ${error.message}`, 'error');
+        console.error('Erro completo:', error);
+        document.getElementById('btn-init').disabled = false;
+      }
+    }
+
+    function openModal() {
+      if (!widgetInitialized) {
+        log('⚠️ Widget não foi inicializado ainda!', 'warning');
+        return;
+      }
+
+      log('📖 Chamando PaymentWidget.open()...', 'info');
+
+      // Estado ANTES
+      const stateBefore = window.PaymentWidget.getState();
+      log(`📊 Estado ANTES: isOpen=${stateBefore.isOpen}, isLoaded=${stateBefore.isLoaded}`, 'info');
+
+      // Abre o modal
+      window.PaymentWidget.open();
+
+      // Estado DEPOIS (com pequeno delay)
+      setTimeout(() => {
+        const stateAfter = window.PaymentWidget.getState();
+        log(`📊 Estado DEPOIS: isOpen=${stateAfter.isOpen}, isLoaded=${stateAfter.isLoaded}`, 'info');
+
+        if (stateAfter.isOpen) {
+          log('✅ Modal abriu corretamente!', 'success');
+        } else {
+          log('❌ Modal NÃO abriu (isOpen ainda é false)', 'error');
+        }
+
+        inspectContainer();
+      }, 100);
+    }
+
+    function closeModal() {
+      if (!widgetInitialized) {
+        log('⚠️ Widget não foi inicializado ainda!', 'warning');
+        return;
+      }
+
+      log('📕 Chamando PaymentWidget.close()...', 'info');
+      window.PaymentWidget.close();
+
+      setTimeout(() => {
+        const state = window.PaymentWidget.getState();
+        log(`📊 Estado após close: isOpen=${state.isOpen}`, 'info');
+        inspectContainer();
+      }, 100);
+    }
+
+    function inspectContainer() {
+      if (!widgetInitialized) {
+        log('⚠️ Widget não foi inicializado, nada para inspecionar', 'warning');
+        return;
+      }
+
+      log('🔬 Inspecionando estrutura do DOM...', 'info');
+
+      // Procura o container
+      const containers = document.querySelectorAll('[id^="payment-widget-"]');
+
+      if (containers.length === 0) {
+        log('❌ Container não encontrado!', 'error');
+        return;
+      }
+
+      log(`✅ Encontrado ${containers.length} container(s)`, 'success');
+
+      containers.forEach((container, index) => {
+        log(`\n━━━ Container #${index + 1} (${container.id}) ━━━`, 'info');
+
+        // CSS do container
+        const styles = window.getComputedStyle(container);
+        log(`📐 CSS do container:`, 'info');
+        log(`  • display: ${styles.display}`, styles.display === 'none' ? 'error' : 'success');
+        log(`  • pointer-events: ${styles.pointerEvents}`, styles.pointerEvents === 'none' ? 'warning' : 'success');
+        log(`  • z-index: ${styles.zIndex}`, 'info');
+        log(`  • position: ${styles.position}`, 'info');
+        log(`  • visibility: ${styles.visibility}`, 'info');
+
+        // Shadow DOM
+        if (container.shadowRoot) {
+          log(`✅ Shadow DOM existe (mode: ${container.shadowRoot.mode})`, 'success');
+
+          const root = container.shadowRoot.querySelector('#pw-root');
+          if (root) {
+            log(`✅ Root element (#pw-root) encontrado`, 'success');
+            log(`  • Children: ${root.children.length}`, 'info');
+
+            // Procura o overlay do modal
+            const overlay = container.shadowRoot.querySelector('[data-state]') ||
+              container.shadowRoot.querySelector('.modal-overlay') ||
+              container.shadowRoot.querySelector('[role="dialog"]');
+
+            if (overlay) {
+              const overlayStyles = window.getComputedStyle(overlay);
+              log(`✅ Overlay do modal encontrado`, 'success');
+              log(`  • display: ${overlayStyles.display}`, 'info');
+              log(`  • opacity: ${overlayStyles.opacity}`, 'info');
+              log(`  • visibility: ${overlayStyles.visibility}`, 'info');
+              log(`  • data-state: ${overlay.getAttribute('data-state')}`, 'info');
+            } else {
+              log(`⚠️ Overlay do modal não encontrado no Shadow DOM`, 'warning');
+            }
+          } else {
+            log(`❌ Root element (#pw-root) NÃO encontrado`, 'error');
+          }
+        } else {
+          log(`❌ Shadow DOM NÃO existe!`, 'error');
+        }
+      });
+    }
+
+    // Log inicial
+    window.addEventListener('DOMContentLoaded', () => {
+      log('✅ Página carregada - Clique em "Inicializar Widget"', 'success');
+      log(`🌐 Timestamp do teste: ${new Date().toISOString()}`, 'info');
+      log(`📦 Cache bust será aplicado automaticamente`, 'info');
+    });
+  </script>
+</body>
+
+</html>

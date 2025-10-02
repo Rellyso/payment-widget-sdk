@@ -172,7 +172,14 @@ create_bucket_if_needed() {
       --index-document index.html \
       --error-document error.html
     
+    # Desabilitar Block Public Access
+    log "Configurando Block Public Access..."
+    aws s3api put-public-access-block \
+      --bucket "$BUCKET_NAME" \
+      --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+    
     # Configurar política de bucket
+    log "Configurando bucket policy..."
     cat > bucket-policy.json << EOF
 {
   "Version": "2012-10-17",
@@ -253,27 +260,32 @@ upload_files() {
   
   # Sincronizar arquivos com cache headers apropriados
   
-  # Bootstrap (cache curto)
+  # Bootstrap (cache curto - 5 minutos)
+  log "📦 Uploading bootstrap..."
   aws s3 cp "dist/bootstrap/widget-bootstrap.v1.min.js" \
     "s3://$BUCKET_NAME/widget-bootstrap.v1.min.js" \
     --content-type "application/javascript" \
     --cache-control "public, max-age=300" \
     --metadata-directive REPLACE
   
-  # CDN bundle (cache longo)
+  # CDN bundle (cache longo - 1 ano)
+  log "📦 Uploading CDN bundle..."
   aws s3 cp "dist/cdn/widget.v1.min.js" \
     "s3://$BUCKET_NAME/widget.v1.min.js" \
     --content-type "application/javascript" \
     --cache-control "public, max-age=31536000" \
     --metadata-directive REPLACE
   
-  # CSS (cache longo)
+  # CSS (cache longo - 1 ano) - OBRIGATÓRIO
+  log "📦 Uploading CSS..."
   if [ -f "dist/cdn/widget.v1.min.css" ]; then
     aws s3 cp "dist/cdn/widget.v1.min.css" \
       "s3://$BUCKET_NAME/widget.v1.min.css" \
       --content-type "text/css" \
       --cache-control "public, max-age=31536000" \
       --metadata-directive REPLACE
+  else
+    error "Arquivo CSS não encontrado: dist/cdn/widget.v1.min.css"
   fi
   
   # SDK files (cache longo)
@@ -339,22 +351,36 @@ test_deployment() {
   log "Testando deployment..."
   
   # Testar bootstrap
+  log "Testando bootstrap..."
   BOOTSTRAP_URL="${CDN_BASE_URL}/widget-bootstrap.v1.min.js"
   HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$BOOTSTRAP_URL")
   
   if [ "$HTTP_CODE" != "200" ]; then
     error "Bootstrap não acessível: $BOOTSTRAP_URL (HTTP $HTTP_CODE)"
   fi
+  log "✅ Bootstrap OK"
   
-  # Testar CDN bundle  
+  # Testar CDN bundle
+  log "Testando CDN bundle..."
   CDN_URL="${CDN_BASE_URL}/widget.v1.min.js"
   HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$CDN_URL")
   
   if [ "$HTTP_CODE" != "200" ]; then
     error "CDN bundle não acessível: $CDN_URL (HTTP $HTTP_CODE)"
   fi
+  log "✅ CDN Bundle OK"
   
-  log "✅ Testes de deployment aprovados"
+  # Testar CSS
+  log "Testando CSS..."
+  CSS_URL="${CDN_BASE_URL}/widget.v1.min.css"
+  HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$CSS_URL")
+  
+  if [ "$HTTP_CODE" != "200" ]; then
+    error "CSS não acessível: $CSS_URL (HTTP $HTTP_CODE)"
+  fi
+  log "✅ CSS OK"
+  
+  log "✅ Todos os testes de deployment aprovados"
 }
 
 # Relatório final
@@ -386,9 +412,14 @@ EOF
   echo "URLs de produção:"
   echo "📦 Bootstrap: ${CDN_BASE_URL}/widget-bootstrap.v1.min.js"
   echo "📦 CDN Bundle: ${CDN_BASE_URL}/widget.v1.min.js"
+  echo "🎨 CSS: ${CDN_BASE_URL}/widget.v1.min.css"
   echo ""
   echo "Exemplo de uso:"
   echo '<script src="'${CDN_BASE_URL}'/widget-bootstrap.v1.min.js" data-merchant-id="seu-merchant" async></script>'
+  echo ""
+  echo "⚠️ Importante:"
+  echo "• O CSS é carregado automaticamente pelo bootstrap no Shadow DOM"
+  echo "• Aguarde ~2 minutos para a invalidação do CloudFront completar"
 }
 
 # Função principal

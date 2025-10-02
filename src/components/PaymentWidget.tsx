@@ -3,7 +3,6 @@ import { useState } from "react";
 import type { WidgetConfig, WidgetState, WidgetStep } from "../types";
 import { WIDGET_STEPS } from "../types";
 import { PaymentModal } from "./PaymentModal";
-import { StepNavigation } from "./StepNavigation";
 import { AddressFormStep } from "./steps/AddressFormStep";
 import { AnalysisResultStep } from "./steps/AnalysisResultStep";
 import { AuthorizationStep } from "./steps/AuthorizationStep";
@@ -22,6 +21,7 @@ export function PaymentWidget({ config, initialState }: PaymentWidgetProps) {
     isOpen: false,
     currentStep: WIDGET_STEPS.AUTHORIZATION,
     isLoading: false,
+    isLoaded: false,
     ...initialState,
   }));
 

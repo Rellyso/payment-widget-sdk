@@ -1,7 +1,7 @@
 {
   "environment": "staging",
-  "deployTime": "qui  2 out 2025 08:58:17 -03",
-  "commitHash": "8d1694dd87b0f73edca1513be183af21869f6453",
+  "deployTime": "qui  2 out 2025 10:06:40 -03",
+  "commitHash": "c42ce46092923a8a338deab59fb8e3ecf890b95f",
   "bucketName": "cartao-simples-widget-staging",
   "cdnBaseUrl": "https://d2x7cg3k3on9lk.cloudfront.net",
   "files": {

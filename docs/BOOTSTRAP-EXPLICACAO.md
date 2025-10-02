@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 **Exemplo de uso com data-attributes:**
 
 ```html
-<script 
+<script
   src="https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js"
   data-merchant-id="merchant_123"
   data-primary-color="#FF6B6B"
@@ -71,11 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
 ```html
 <script>
   window.PaymentWidgetInit = {
-    merchantId: 'merchant_123',
+    merchantId: "merchant_123",
     theme: {
-      primaryColor: '#FF6B6B'
+      primaryColor: "#FF6B6B",
     },
-    autoOpen: true
+    autoOpen: true,
   };
 </script>
 <script src="https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js"></script>
@@ -88,14 +88,14 @@ O desenvolvedor pode chamar manualmente após carregar o script:
 ```javascript
 // Aguarda o script estar carregado
 await window.PaymentWidget.init({
-  merchantId: 'merchant_123',
+  merchantId: "merchant_123",
   theme: {
-    primaryColor: '#FF6B6B',
-    secondaryColor: '#4ECDC4',
-    borderRadius: 'lg'
+    primaryColor: "#FF6B6B",
+    secondaryColor: "#4ECDC4",
+    borderRadius: "lg",
   },
-  logoUrl: 'https://minha-empresa.com/logo.png',
-  environment: 'production'
+  logoUrl: "https://minha-empresa.com/logo.png",
+  environment: "production",
 });
 
 // Abre o widget quando necessário
@@ -111,9 +111,9 @@ window.PaymentWidget.open();
 ```typescript
 class PaymentWidgetBootstrap {
   private readonly state: BootstrapState = {
-    instances: Map<string, InternalWidgetInstance>,  // Múltiplas instâncias
-    isLoaded: boolean,                                // Bundle carregado?
-    loadPromise: Promise<void> | null                 // Promise de carregamento
+    instances: Map<string, InternalWidgetInstance>, // Múltiplas instâncias
+    isLoaded: boolean, // Bundle carregado?
+    loadPromise: Promise<void> | null, // Promise de carregamento
   };
 }
 ```
@@ -180,13 +180,13 @@ Suporta múltiplos widgets na mesma página (útil para marketplaces):
 
 ```javascript
 // Inicializa múltiplos merchants
-await PaymentWidget.init({ merchantId: 'merchant_1' });
-await PaymentWidget.init({ merchantId: 'merchant_2' });
+await PaymentWidget.init({ merchantId: "merchant_1" });
+await PaymentWidget.init({ merchantId: "merchant_2" });
 
 // Controla cada um independentemente
-PaymentWidget.open('merchant_1');  // Abre o primeiro
-PaymentWidget.close('merchant_1'); // Fecha o primeiro
-PaymentWidget.open('merchant_2');  // Abre o segundo
+PaymentWidget.open("merchant_1"); // Abre o primeiro
+PaymentWidget.close("merchant_1"); // Fecha o primeiro
+PaymentWidget.open("merchant_2"); // Abre o segundo
 ```
 
 ### **2. Shadow DOM (Isolamento de Estilos)**
@@ -196,13 +196,13 @@ private createShadowDOM(container: HTMLElement): ShadowRoot | null {
   try {
     if (container.attachShadow) {
       const shadowRoot = container.attachShadow({ mode: "open" });
-      
+
       // Cria elemento root dentro do shadow
       const rootDiv = document.createElement("div");
       rootDiv.id = "pw-root";
       rootDiv.className = "pw-root payment-widget";
       shadowRoot.appendChild(rootDiv);
-      
+
       return shadowRoot;
     }
   } catch (error) {
@@ -306,13 +306,13 @@ private applyTheme(element: HTMLElement, config: WidgetConfig): void {
 
 ```javascript
 PaymentWidget.init({
-  merchantId: 'merchant_123',
-  logoUrl: 'https://minha-empresa.com/logo.png',
+  merchantId: "merchant_123",
+  logoUrl: "https://minha-empresa.com/logo.png",
   theme: {
-    primaryColor: '#FF6B6B',      // Vermelho coral
-    secondaryColor: '#4ECDC4',    // Verde água
-    borderRadius: 'lg'            // Bordas grandes (12px)
-  }
+    primaryColor: "#FF6B6B", // Vermelho coral
+    secondaryColor: "#4ECDC4", // Verde água
+    borderRadius: "lg", // Bordas grandes (12px)
+  },
 });
 ```
 
@@ -320,10 +320,10 @@ PaymentWidget.init({
 
 ```typescript
 const presets = {
-  sm: "4px",    // Pequeno
-  md: "8px",    // Médio
-  lg: "12px",   // Grande
-  full: "9999px" // Totalmente arredondado
+  sm: "4px", // Pequeno
+  md: "8px", // Médio
+  lg: "12px", // Grande
+  full: "9999px", // Totalmente arredondado
 };
 ```
 
@@ -355,7 +355,7 @@ function extractConfigFromDataAttributes(
 **Uso no HTML:**
 
 ```html
-<script 
+<script
   src="https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js"
   data-merchant-id="merchant_123"
   data-primary-color="#FF6B6B"
@@ -377,16 +377,16 @@ function extractConfigFromDataAttributes(
 window.PaymentWidget = {
   // Inicializa o widget com configuração
   init: (config: WidgetConfig) => Promise<void>,
-  
+
   // Abre o modal do widget
   open: (merchantId?: string) => void,
-  
+
   // Fecha o modal do widget
   close: (merchantId?: string) => void,
-  
+
   // Remove completamente o widget do DOM
   destroy: (merchantId?: string) => void,
-  
+
   // Retorna o estado atual do widget
   getState: () => WidgetState
 };
@@ -397,39 +397,39 @@ window.PaymentWidget = {
 ```javascript
 // 1. Inicializar o widget
 await window.PaymentWidget.init({
-  merchantId: 'merchant_123',
-  environment: 'production',
+  merchantId: "merchant_123",
+  environment: "production",
   theme: {
-    primaryColor: '#FF6B6B',
-    secondaryColor: '#4ECDC4'
+    primaryColor: "#FF6B6B",
+    secondaryColor: "#4ECDC4",
   },
-  
+
   // Callbacks
   onSuccess: (data) => {
-    console.log('Pagamento aprovado!', data);
+    console.log("Pagamento aprovado!", data);
     // { transactionId, token, merchantId, amount, ... }
   },
   onError: (error) => {
-    console.error('Erro no pagamento:', error);
+    console.error("Erro no pagamento:", error);
     // { code, message, details }
   },
   onOpen: () => {
-    console.log('Widget aberto');
+    console.log("Widget aberto");
   },
   onClose: () => {
-    console.log('Widget fechado');
-  }
+    console.log("Widget fechado");
+  },
 });
 
 // 2. Abrir o widget quando o usuário clicar em um botão
-document.getElementById('pay-button').addEventListener('click', () => {
+document.getElementById("pay-button").addEventListener("click", () => {
   window.PaymentWidget.open();
 });
 
 // 3. Verificar o estado atual
 const state = window.PaymentWidget.getState();
-console.log('Widget está aberto?', state.isOpen);
-console.log('Bundle carregado?', state.isLoaded);
+console.log("Widget está aberto?", state.isOpen);
+console.log("Bundle carregado?", state.isLoaded);
 
 // 4. Fechar programaticamente
 window.PaymentWidget.close();
@@ -662,6 +662,7 @@ Gera: `dist/bootstrap/widget-bootstrap.v1.min.js` (~5KB)
 ```
 
 O script automaticamente:
+
 1. Builda todos os targets (SDK, CDN, Bootstrap)
 2. Valida integridade dos arquivos
 3. Faz upload para S3 com CORS headers
@@ -683,11 +684,11 @@ O script automaticamente:
 
 ```javascript
 // Verificar se o bundle foi carregado
-console.log('CartaoSimplesWidget disponível?', !!window.CartaoSimplesWidget);
+console.log("CartaoSimplesWidget disponível?", !!window.CartaoSimplesWidget);
 
 // Verificar estado do bootstrap
 const state = window.PaymentWidget?.getState();
-console.log('Estado do widget:', state);
+console.log("Estado do widget:", state);
 ```
 
 ### **Problema: "CORS error"**
@@ -706,8 +707,8 @@ console.log('Estado do widget:', state);
 
 ```javascript
 // Especificar merchantId ao abrir/fechar
-PaymentWidget.open('merchant_1');
-PaymentWidget.close('merchant_1');
+PaymentWidget.open("merchant_1");
+PaymentWidget.close("merchant_1");
 
 // Sem merchantId, usa o primeiro encontrado
 PaymentWidget.open(); // Abre primeiro merchant
@@ -733,6 +734,6 @@ O **Bootstrap Loader** é essencialmente o **"gerente de carga"** do widget:
 ✅ Aplica temas personalizados dinamicamente  
 ✅ Expõe API simples para desenvolvedores  
 ✅ Suporta múltiplas instâncias  
-✅ Otimizado para performance e cache  
+✅ Otimizado para performance e cache
 
 Esta arquitetura permite que o widget seja **leve, rápido e flexível**, mantendo uma **excelente experiência de desenvolvedor (DX)** e **performance para o usuário final (UX)**.
