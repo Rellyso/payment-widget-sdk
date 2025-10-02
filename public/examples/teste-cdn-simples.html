@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste CDN Simples - Widget</title>
+
+  <!-- CSS do Widget -->
+  <link rel="stylesheet" href="https://d2x7cg3k3on9lk.cloudfront.net/widget.v1.min.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .test-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .status {
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 5px 10px 0;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .code {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+
+    .file-info {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .file-info:last-child {
+      border-bottom: none;
+    }
+
+    #widget-container {
+      margin-top: 30px;
+      padding: 20px;
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      min-height: 100px;
+      background: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-card">
+    <h1>🚀 Teste CDN CloudFront</h1>
+    <p style="color: #666; margin-bottom: 20px;">
+      Teste de carregamento dos arquivos do widget via CloudFront
+    </p>
+
+    <div id="status-cdn" class="status info">
+      ⏳ Verificando arquivos no CDN...
+    </div>
+
+    <h3>📦 Arquivos CDN</h3>
+    <div class="test-card" style="background: #f9f9f9; padding: 15px;">
+      <div class="file-info">
+        <span>CSS</span>
+        <span id="css-status">⏳ Verificando...</span>
+      </div>
+      <div class="file-info">
+        <span>Bootstrap JS</span>
+        <span id="bootstrap-status">⏳ Verificando...</span>
+      </div>
+      <div class="file-info">
+        <span>Widget Bundle</span>
+        <span id="bundle-status">⏳ Verificando...</span>
+      </div>
+    </div>
+
+    <h3>🔧 Ações</h3>
+    <button onclick="testCDN()">🔄 Testar CDN</button>
+    <button onclick="loadWidget()">📦 Carregar Widget</button>
+    <button onclick="showConsole()">🔍 Ver Console</button>
+
+    <h3>📝 URL Base do CDN</h3>
+    <div class="code">
+      https://d2x7cg3k3on9lk.cloudfront.net/
+    </div>
+
+    <div id="widget-container"></div>
+  </div>
+
+  <script>
+    const CDN_URL = 'https://d2x7cg3k3on9lk.cloudfront.net';
+    let testsComplete = false;
+
+    // Função para testar um arquivo
+    async function testFile(url, statusElementId, name) {
+      console.log(`Testando ${name}: ${url}`);
+
+      try {
+        const response = await fetch(url, {
+          method: 'HEAD',
+          cache: 'no-cache'
+        });
+
+        const element = document.getElementById(statusElementId);
+
+        if (response.ok) {
+          const size = response.headers.get('content-length');
+          const sizeKB = size ? (parseInt(size) / 1024).toFixed(1) : '?';
+          element.textContent = `✅ OK (${sizeKB} KB)`;
+          element.style.color = '#28a745';
+          console.log(`✅ ${name} carregado com sucesso! (${sizeKB} KB)`);
+          return true;
+        } else {
+          element.textContent = `❌ Erro ${response.status}`;
+          element.style.color = '#dc3545';
+          console.error(`❌ ${name} falhou: HTTP ${response.status}`);
+          return false;
+        }
+      } catch (error) {
+        const element = document.getElementById(statusElementId);
+        element.textContent = `❌ Erro: ${error.message}`;
+        element.style.color = '#dc3545';
+        console.error(`❌ ${name} erro:`, error);
+        return false;
+      }
+    }
+
+    // Testar todos os arquivos do CDN
+    async function testCDN() {
+      console.log('🚀 Iniciando testes do CDN...');
+
+      const statusDiv = document.getElementById('status-cdn');
+      statusDiv.className = 'status info';
+      statusDiv.textContent = '⏳ Testando arquivos...';
+
+      const results = await Promise.all([
+        testFile(`${CDN_URL}/widget.v1.min.css`, 'css-status', 'CSS'),
+        testFile(`${CDN_URL}/widget-bootstrap.v1.min.js`, 'bootstrap-status', 'Bootstrap'),
+        testFile(`${CDN_URL}/widget.v1.min.js`, 'bundle-status', 'Widget Bundle')
+      ]);
+
+      testsComplete = true;
+
+      if (results.every(r => r === true)) {
+        statusDiv.className = 'status success';
+        statusDiv.textContent = '✅ Todos os arquivos do CDN estão acessíveis!';
+        console.log('🎉 Todos os testes passaram!');
+      } else {
+        statusDiv.className = 'status error';
+        statusDiv.textContent = '❌ Alguns arquivos não foram encontrados. Verifique o console.';
+        console.error('⚠️ Alguns testes falharam!');
+      }
+    }
+
+    // Carregar o widget dinamicamente
+    function loadWidget() {
+      if (!testsComplete) {
+        alert('⚠️ Execute os testes primeiro para verificar se o CDN está acessível!');
+        return;
+      }
+
+      console.log('📦 Carregando widget do CDN...');
+
+      const container = document.getElementById('widget-container');
+      container.innerHTML = '<p style="color: #666;">⏳ Carregando widget via CDN...</p>';
+
+      // Criar script tag para carregar o bootstrap
+      const script = document.createElement('script');
+      script.src = `${CDN_URL}/widget-bootstrap.v1.min.js`;
+      script.async = true;
+
+      script.onload = function () {
+        console.log('✅ Bootstrap carregado!');
+        container.innerHTML = '<p style="color: #28a745;">✅ Widget carregado com sucesso via CDN!</p>';
+
+        // Verificar se o widget está disponível globalmente
+        if (window.CartaoSimplesWidget) {
+          console.log('✅ CartaoSimplesWidget disponível!', window.CartaoSimplesWidget);
+          container.innerHTML += '<p>✅ Objeto global CartaoSimplesWidget detectado!</p>';
+        } else {
+          console.warn('⚠️ CartaoSimplesWidget não encontrado no window');
+        }
+      };
+
+      script.onerror = function () {
+        console.error('❌ Erro ao carregar bootstrap');
+        container.innerHTML = '<p style="color: #dc3545;">❌ Erro ao carregar widget do CDN</p>';
+      };
+
+      document.head.appendChild(script);
+    }
+
+    // Mostrar console
+    function showConsole() {
+      console.log('='.repeat(50));
+      console.log('📊 RESUMO DO TESTE CDN');
+      console.log('='.repeat(50));
+      console.log('URL Base:', CDN_URL);
+      console.log('Testes executados:', testsComplete ? 'Sim' : 'Não');
+      console.log('');
+      console.log('Arquivos:');
+      console.log('- CSS:', `${CDN_URL}/widget.v1.min.css`);
+      console.log('- Bootstrap:', `${CDN_URL}/widget-bootstrap.v1.min.js`);
+      console.log('- Bundle:', `${CDN_URL}/widget.v1.min.js`);
+      console.log('='.repeat(50));
+      alert('✅ Informações exibidas no console! Abra o DevTools (F12) para ver.');
+    }
+
+    // Executar testes automaticamente ao carregar
+    window.addEventListener('load', () => {
+      console.log('🌐 Página carregada. Iniciando testes...');
+      setTimeout(testCDN, 1000);
+    });
+  </script>
+</body>
+
+</html>
