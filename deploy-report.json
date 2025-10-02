@@ -1,0 +1,11 @@
+{
+  "environment": "staging",
+  "deployTime": "qui  2 out 2025 08:58:17 -03",
+  "commitHash": "8d1694dd87b0f73edca1513be183af21869f6453",
+  "bucketName": "cartao-simples-widget-staging",
+  "cdnBaseUrl": "https://d2x7cg3k3on9lk.cloudfront.net",
+  "files": {
+    "bootstrap": "https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js",
+    "cdn": "https://d2x7cg3k3on9lk.cloudfront.net/widget.v1.min.js"
+  }
+}

@@ -12,7 +12,8 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, "src/bootstrap/index.ts"),
       name: "PaymentWidgetBootstrap",
-      fileName: "widget-bootstrap.v1.min",
+      fileName: (format) =>
+        `widget-bootstrap.v1.min.${format === "umd" ? "js" : format}`,
       formats: ["umd"],
     },
     rollupOptions: {

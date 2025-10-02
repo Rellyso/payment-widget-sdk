@@ -100,14 +100,11 @@
   "IsIPV6Enabled": true,
   "WebACLId": "",
   "Aliases": {
-    "Quantity": 1,
-    "Items": ["cdn.cartaosimples.com"]
+    "Quantity": 0,
+    "Items": []
   },
   "ViewerCertificate": {
-    "CloudFrontDefaultCertificate": false,
-    "ACMCertificateArn": "arn:aws:acm:us-east-1:ACCOUNT_ID:certificate/CERTIFICATE_ID",
-    "SSLSupportMethod": "sni-only",
-    "MinimumProtocolVersion": "TLSv1.2_2021"
+    "CloudFrontDefaultCertificate": true
   },
   "CustomErrorResponses": {
     "Quantity": 2,

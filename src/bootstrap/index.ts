@@ -20,7 +20,7 @@ type WidgetInstance = {
   api: WidgetAPI | null;
 };
 
-const CDN_BASE_URL = "https://cdn.cartaosimples.com";
+const CDN_BASE_URL = "https://d2x7cg3k3on9lk.cloudfront.net";
 const WIDGET_BUNDLE_URL = `${CDN_BASE_URL}/widget.v1.min.js`;
 const CONTAINER_ID_PREFIX = "__payment_widget_root__";
 const ROOT_ELEMENT_ID = "pw-root";

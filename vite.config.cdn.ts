@@ -15,7 +15,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, "src/cdn/index.ts"),
       name: "CartaoSimplesWidget",
-      fileName: "widget.v1.min",
+      fileName: (format) => `widget.v1.min.${format === "umd" ? "js" : format}`,
       formats: ["umd"],
     },
     rollupOptions: {
@@ -24,6 +24,12 @@ export default defineConfig({
       output: {
         inlineDynamicImports: true,
         globals: {}, // Vazio pois não temos externals
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name?.endsWith(".css")) {
+            return "widget.v1.min.css";
+          }
+          return assetInfo.name || "asset[extname]";
+        },
       },
     },
     minify: "terser",
