@@ -23,6 +23,7 @@ Bem-vindo à documentação completa do Payment Widget! Aqui você encontra tudo
 ### 📋 Referência Completa
 
 - **[Índice de Documentação](./DOCS-INDEX.md)** - Navegação organizada por caso de uso
+- **[Explicação do Bootstrap](./BOOTSTRAP-EXPLICACAO.md)** - Como funciona o Bootstrap Loader (técnico)
 
 ## 🎯 Navegação por Objetivo
 
@@ -48,7 +49,8 @@ Bem-vindo à documentação completa do Payment Widget! Aqui você encontra tudo
 
 1. Leia [Guia de Deploy CDN](./GUIA-DEPLOY-CDN.md) - Seção Arquitetura
 2. Consulte [Resumo Visual](./RESUMO-VISUAL.md) para visão geral
-3. Veja `.github/copilot-instructions.md` para detalhes técnicos
+3. Aprofunde-se em [Explicação do Bootstrap](./BOOTSTRAP-EXPLICACAO.md) para detalhes do loader
+4. Veja `.github/copilot-instructions.md` para detalhes técnicos
 
 ## 🏗️ Arquitetura do Projeto
 

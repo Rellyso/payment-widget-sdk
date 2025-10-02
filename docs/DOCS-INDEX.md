@@ -36,6 +36,21 @@ Este projeto possui documentação completa e organizada. Use este índice para 
 
 **Use quando:** Você quer entender como o widget funciona em profundidade ou precisa da referência completa da API.
 
+### [BOOTSTRAP-EXPLICACAO.md](./BOOTSTRAP-EXPLICACAO.md)
+
+**Explicação técnica detalhada do Bootstrap Loader.**
+
+- O que é e para que serve o bootstrap
+- Quando e como é executado
+- Arquitetura de 3 camadas (Bootstrap → CDN → UI)
+- Fluxo de inicialização completo
+- Recursos principais (multi-instância, Shadow DOM, lazy loading, white-label)
+- API pública e exemplos de uso
+- Ciclo de vida detalhado
+- Troubleshooting técnico
+
+**Use quando:** Você quer entender em profundidade como funciona o carregamento do widget, ou precisa modificar o bootstrap.
+
 ---
 
 ## 🏗️ Para Deploy e Infraestrutura
@@ -179,6 +194,10 @@ README.md (Troubleshooting) → GUIA-DEPLOY-CDN.md (Troubleshooting)
 ### Preciso entender a arquitetura
 
 → **[GUIA-DEPLOY-CDN.md](./GUIA-DEPLOY-CDN.md)** → Seção "Arquitetura da Solução"
+
+### Quero entender como funciona o Bootstrap Loader
+
+→ **[BOOTSTRAP-EXPLICACAO.md](./BOOTSTRAP-EXPLICACAO.md)** → Explicação completa técnica
 
 ### Vou fazer alterações no código
 
