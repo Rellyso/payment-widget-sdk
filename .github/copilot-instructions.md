@@ -3,15 +3,18 @@ applyTo: "**/*.{ts,tsx,js,jsx}"
 ---
 
 # Project Context
+
 Ultracite enforces strict type safety, accessibility standards, and consistent code quality for JavaScript/TypeScript projects using Biome's lightning-fast formatter and linter.
 
 ## Key Principles
+
 - Zero configuration required
 - Subsecond performance
 - Maximum type safety
 - AI-friendly code generation
 
 ## Before Writing Code
+
 1. Analyze existing patterns in the codebase
 2. Consider edge cases and error scenarios
 3. Follow the rules below strictly
@@ -20,6 +23,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 ## Rules
 
 ### Accessibility (a11y)
+
 - Don't use `accessKey` attribute on any HTML element.
 - Don't set `aria-hidden="true"` on focusable elements.
 - Don't add ARIA roles, states, and properties to elements that don't support them.
@@ -56,6 +60,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Use correct ISO language/country codes for the `lang` attribute.
 
 ### Code Complexity and Quality
+
 - Don't use consecutive spaces in regular expression literals.
 - Don't use the `arguments` object.
 - Don't use primitive type aliases or misleading types.
@@ -111,6 +116,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Don't use literal numbers that lose precision.
 
 ### React and JSX Best Practices
+
 - Don't use the return value of React.render.
 - Make sure all dependencies are correctly specified in React hooks.
 - Make sure all React hooks are called from the top level of component functions.
@@ -129,6 +135,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Watch out for possible "wrong" semicolons inside JSX elements.
 
 ### Correctness and Safety
+
 - Don't assign a value to itself.
 - Don't return a value from a setter.
 - Don't compare expressions that modify string case with non-compliant values.
@@ -153,7 +160,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Don't use bitwise operators.
 - Don't use expressions where the operation doesn't change the value.
 - Make sure Promise-like statements are handled appropriately.
-- Don't use __dirname and __filename in the global scope.
+- Don't use **dirname and **filename in the global scope.
 - Prevent import cycles.
 - Don't use configured elements.
 - Don't hardcode sensitive data like API keys and tokens.
@@ -184,6 +191,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Don't use `target="_blank"` without `rel="noopener"`.
 
 ### TypeScript Best Practices
+
 - Don't use TypeScript enums.
 - Don't export imported variables.
 - Don't add type annotations to variables, parameters, and class properties that are initialized with literal expressions.
@@ -208,6 +216,7 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Use the namespace keyword instead of the module keyword to declare TypeScript namespaces.
 
 ### Style and Consistency
+
 - Don't use global `eval()`.
 - Don't use callbacks in asynchronous tests and hooks.
 - Don't use negation in `if` statements that have `else` clauses.
@@ -295,30 +304,34 @@ Ultracite enforces strict type safety, accessibility standards, and consistent c
 - Make sure to use the "use strict" directive in script files.
 
 ### Next.js Specific Rules
+
 - Don't use `<img>` elements in Next.js projects.
 - Don't use `<head>` elements in Next.js projects.
-- Don't import next/document outside of pages/_document.jsx in Next.js projects.
-- Don't use the next/head module in pages/_document.js on Next.js projects.
+- Don't import next/document outside of pages/\_document.jsx in Next.js projects.
+- Don't use the next/head module in pages/\_document.js on Next.js projects.
 
 ### Testing Best Practices
+
 - Don't use export or module.exports in test files.
 - Don't use focused tests.
 - Make sure the assertion function, like expect, is placed inside an it() function call.
 - Don't use disabled tests.
 
 ## Common Tasks
+
 - `npx ultracite init` - Initialize Ultracite in your project
 - `npx ultracite fix` - Format and fix code automatically
 - `npx ultracite check` - Check for issues without fixing
 
 ## Example: Error Handling
+
 ```typescript
 // ✅ Good: Comprehensive error handling
 try {
   const result = await fetchData();
   return { success: true, data: result };
 } catch (error) {
-  console.error('API call failed:', error);
+  console.error("API call failed:", error);
   return { success: false, error: error.message };
 }
 
@@ -329,3 +342,214 @@ try {
   console.log(e);
 }
 ```
+
+---
+
+# Payment Widget Project - Specific Guidelines
+
+## Project Architecture
+
+### Build Outputs
+
+This project generates 3 distinct builds:
+
+1. **SDK** (`dist/sdk/`) - NPM package for React projects
+2. **CDN Bundle** (`dist/cdn/`) - Standalone bundle with React included (~400KB)
+3. **Bootstrap** (`dist/bootstrap/`) - Lightweight loader (~5KB)
+
+### CDN Configuration
+
+- **CloudFront Distribution**: `EOLJNTE5PW5O9`
+- **CDN Base URL**: `https://d2x7cg3k3on9lk.cloudfront.net`
+- **S3 Buckets**:
+  - Production: `cartao-simples-widget`
+  - Staging: `cartao-simples-widget-staging`
+
+⚠️ **CRITICAL**: When modifying `src/bootstrap/index.ts`, the `CDN_BASE_URL` constant MUST point to the CloudFront distribution URL, NOT a placeholder domain.
+
+```typescript
+// ✅ Correct
+const CDN_BASE_URL = "https://d2x7cg3k3on9lk.cloudfront.net";
+
+// ❌ Wrong - Will cause 404 errors in production
+const CDN_BASE_URL = "https://cdn.cartaosimples.com";
+```
+
+## Build and Deploy
+
+### Build Commands
+
+```bash
+npm run build:sdk          # Build NPM package
+npm run build:cdn          # Build CDN bundle
+npm run build:bootstrap    # Build bootstrap loader
+npm run build              # Build all three
+```
+
+### Deploy Process
+
+```bash
+./deploy.sh staging        # Deploy to staging
+./deploy.sh production     # Deploy to production
+```
+
+The deploy script automatically:
+
+- ✅ Builds all targets
+- ✅ Validates file integrity
+- ✅ Uploads to S3 with correct CORS headers
+- ✅ Invalidates CloudFront cache
+- ✅ Generates SRI hashes
+- ✅ Tests deployment with HTTP checks
+
+### CORS Configuration
+
+All S3 buckets MUST have CORS configured to allow cross-origin requests:
+
+```json
+{
+  "CORSRules": [
+    {
+      "AllowedHeaders": ["*"],
+      "AllowedMethods": ["GET", "HEAD"],
+      "AllowedOrigins": ["*"],
+      "ExposeHeaders": ["ETag", "Content-Length", "Content-Type"],
+      "MaxAgeSeconds": 3600
+    }
+  ]
+}
+```
+
+The deploy script handles this automatically. Never deploy without CORS configured.
+
+## Widget APIs
+
+### Bootstrap API (window.PaymentWidget)
+
+Used when loading via `widget-bootstrap.v1.min.js`:
+
+```typescript
+window.PaymentWidget.init(config: WidgetConfig): Promise<void>
+window.PaymentWidget.open(merchantId?: string): void
+window.PaymentWidget.close(merchantId?: string): void
+window.PaymentWidget.destroy(merchantId?: string): void
+window.PaymentWidget.getState(): { isLoaded: boolean }
+```
+
+### CDN Bundle API (window.CartaoSimplesWidget)
+
+Used when loading via `widget.v1.min.js` directly:
+
+```typescript
+window.CartaoSimplesWidget.mount(
+  container: HTMLElement,
+  config: WidgetConfig
+): WidgetInstance
+
+// Returns instance with:
+instance.open(): void
+instance.close(): void
+instance.destroy(): void
+instance.getState(): { isOpen: boolean }
+```
+
+## File Naming Conventions
+
+All CDN files MUST use `.js` extension (not `.umd.cjs` or `.cjs`):
+
+- ✅ `widget-bootstrap.v1.min.js`
+- ✅ `widget.v1.min.js`
+- ✅ `widget.v1.min.css`
+- ❌ `widget-bootstrap.v1.min.umd.cjs`
+
+Configure in `vite.config.*.ts`:
+
+```typescript
+fileName: (format) => `widget.v1.min.${format === "umd" ? "js" : format}`;
+```
+
+## Testing
+
+### Local Development
+
+```bash
+npm run dev                # Start Vite dev server (port 5173)
+npm run serve              # Start examples server (port 3000)
+```
+
+### Test Pages
+
+- `/examples/cloudfront-test.html` - Full CDN test with logs
+- `/examples/teste-widget-direto.html` - Direct bundle test
+- `/examples/teste-cdn-simples.html` - Simple CDN test
+
+Always test via HTTP server (not `file://`) due to CORS restrictions.
+
+## Common Issues & Solutions
+
+### Issue: "ERR_NAME_NOT_RESOLVED" on widget load
+
+**Cause**: Bootstrap has wrong CDN_BASE_URL  
+**Solution**: Update `src/bootstrap/index.ts` with correct CloudFront URL, rebuild, and redeploy
+
+### Issue: CORS errors in browser
+
+**Cause**: S3 bucket missing CORS configuration  
+**Solution**: Run `./deploy.sh` which configures CORS automatically, or manually apply CORS config
+
+### Issue: Old files served after deploy
+
+**Cause**: CloudFront cache not invalidated  
+**Solution**: Script invalidates automatically. If manual: `aws cloudfront create-invalidation --distribution-id EOLJNTE5PW5O9 --paths "/*"`
+
+### Issue: Widget not found in window object
+
+**Cause**: Using wrong API for the loaded script  
+**Solution**:
+
+- Bootstrap loader → `window.PaymentWidget`
+- CDN bundle → `window.CartaoSimplesWidget`
+
+## Documentation Files
+
+- `GUIA-DEPLOY-CDN.md` - Complete deployment guide (Portuguese)
+- `QUICK-START.md` - 5-minute quick start
+- `GUIA-USO-WIDGET.md` - Widget usage guide with examples
+- `SOLUCAO-CORS.md` - CORS configuration and troubleshooting
+- `COMANDOS-UTEIS.md` - Useful commands reference
+- `RESUMO-VISUAL.md` - Visual summary with status
+
+## Best Practices
+
+### When Modifying Bootstrap
+
+1. Update CDN_BASE_URL if needed
+2. Run `npm run build:bootstrap`
+3. Test locally first
+4. Deploy with `./deploy.sh`
+5. Wait for cache invalidation (~1-2 minutes)
+6. Test production URL
+
+### When Adding New Features
+
+1. Update types in `src/types/index.ts`
+2. Implement in component
+3. Update SDK, CDN, and Bootstrap if needed
+4. Update documentation
+5. Add test page in `/examples`
+6. Full build and deploy
+
+### Cache Strategy
+
+- Bootstrap: Short cache (5 minutes) - frequently updated
+- Bundle/CSS: Long cache (1 year) - versioned URLs
+- Use CloudFront invalidation for urgent updates
+
+## Environment Variables
+
+No `.env` files needed. Configuration is hardcoded in:
+
+- Bootstrap: `src/bootstrap/index.ts` (CDN_BASE_URL)
+- Deploy script: `deploy.sh` (BUCKET_NAME, DISTRIBUTION_ID)
+
+Update these directly when infrastructure changes.
