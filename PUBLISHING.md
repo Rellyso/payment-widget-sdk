@@ -91,7 +91,7 @@ npm run preview            # Preview do build de produção
 # Build completo
 npm run build              # SDK + CDN
 npm run build:sdk          # Apenas SDK (npm)
-npm run build:cdn          # Apenas CDN bundle  
+npm run build:cdn          # Apenas CDN bundle
 npm run build:bootstrap    # Apenas bootstrap loader
 
 # Qualidade
@@ -110,9 +110,9 @@ dist/
 │   └── index.d.ts        # TypeScript definitions
 ├── cdn/                   # Para CDN deploy
 │   ├── widget.v1.min.css       # Styles
-│   └── widget.v1.min.umd.cjs   # Bundle completo
+│   └── widget.v1.min.js   # Bundle completo
 └── bootstrap/             # Loader leve
-    └── widget-bootstrap.v1.min.umd.cjs  # 1.8KB gzipped
+    └── widget-bootstrap.v1.min.js  # 1.8KB gzipped
 ```
 
 ### Verificar Builds
@@ -128,8 +128,8 @@ ls -lah dist/bootstrap/
 
 # Verificar se JS é válido
 node -c dist/sdk/index.js
-node -c dist/cdn/widget.v1.min.umd.cjs
-node -c dist/bootstrap/widget-bootstrap.v1.min.umd.cjs
+node -c dist/cdn/widget.v1.min.js
+node -c dist/bootstrap/widget-bootstrap.v1.min.js
 ```
 
 ---
@@ -179,7 +179,7 @@ npm publish
 
 # Publicação de novas versões
 npm version patch  # 1.0.0 → 1.0.1
-npm version minor  # 1.0.1 → 1.1.0  
+npm version minor  # 1.0.1 → 1.1.0
 npm version major  # 1.1.0 → 2.0.0
 
 npm publish
@@ -221,7 +221,7 @@ npm dist-tag add cartao-simples-widget@1.0.0 latest
 # Configurar credenciais (primeira vez)
 aws configure
 # AWS Access Key ID: [sua-key]
-# AWS Secret Access Key: [sua-secret]  
+# AWS Secret Access Key: [sua-secret]
 # Default region: us-east-1
 # Default output format: json
 
@@ -258,25 +258,25 @@ chmod +x deploy.sh
 
 ```bash
 # Criar bucket (se não existir)
-aws s3 mb s3://cartao-simples-widget-production --region us-east-1
+aws s3 mb s3://cartao-simples-widget-staging --region us-east-1
 
 # Upload bootstrap (cache curto - 5min)
-aws s3 cp dist/bootstrap/widget-bootstrap.v1.min.umd.cjs \
-  s3://cartao-simples-widget-production/widget-bootstrap.v1.min.js \
+aws s3 cp dist/bootstrap/widget-bootstrap.v1.min.js \
+  s3://cartao-simples-widget-staging/widget-bootstrap.v1.min.js \
   --content-type "application/javascript" \
   --cache-control "public, max-age=300" \
   --metadata-directive REPLACE
 
-# Upload CDN bundle (cache longo - 1 ano)  
-aws s3 cp dist/cdn/widget.v1.min.umd.cjs \
-  s3://cartao-simples-widget-production/widget.v1.min.js \
+# Upload CDN bundle (cache longo - 1 ano)
+aws s3 cp dist/cdn/widget.v1.min.js \
+  s3://cartao-simples-widget-staging/widget.v1.min.js \
   --content-type "application/javascript" \
   --cache-control "public, max-age=31536000" \
   --metadata-directive REPLACE
 
 # Upload CSS
 aws s3 cp dist/cdn/widget.v1.min.css \
-  s3://cartao-simples-widget-production/widget.v1.min.css \
+  s3://cartao-simples-widget-staging/widget.v1.min.css \
   --content-type "text/css" \
   --cache-control "public, max-age=31536000" \
   --metadata-directive REPLACE
@@ -288,33 +288,258 @@ aws s3 cp dist/cdn/widget.v1.min.css \
 # Criar distribuição CloudFront
 aws cloudfront create-distribution --distribution-config file://cloudfront.json
 
-# Obter ID da distribuição  
+# Obter ID da distribuição
 aws cloudfront list-distributions --query 'DistributionList.Items[0].Id' --output text
 
 # Invalidar cache após deploy
 aws cloudfront create-invalidation \
-  --distribution-id E1ABCDEFGHIJKL \
+  --distribution-id EOLJNTE5PW5O9 \
   --paths "/*"
 ```
 
-### 6. Configurar DNS
+### 6. Configurar DNS para cdn.cartaosimples.com.br
+
+> **🎯 OBJETIVO:** Configurar `cdn.cartaosimples.com.br` para apontar para a distribuição CloudFront.
+
+#### **Opção A: Usar Domínio CloudFront (Funciona agora)**
 
 ```bash
-# Exemplo com Route 53
+# ✅ Usar diretamente (sem configuração DNS necessária)
+https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js
+https://d2x7cg3k3on9lk.cloudfront.net/widget.v1.min.js
+```
+
+#### **Opção B: Configurar cdn.cartaosimples.com.br**
+
+##### **Passo 1: Criar Hosted Zone para cartaosimples.com.br**
+
+```bash
+# 1. Verificar se já existe hosted zone
+aws route53 list-hosted-zones --query 'HostedZones[?Name==`cartaosimples.com.br.`]'
+
+# 2. Criar hosted zone (se não existir)
+aws route53 create-hosted-zone \
+  --name cartaosimples.com.br \
+  --caller-reference "cartaosimples-$(date +%s)" \
+  --hosted-zone-config Comment="Hosted zone for cartaosimples.com.br"
+
+# 3. Anotar o Hosted Zone ID retornado (ex: /hostedzone/Z1D633PJN98FT9)
+
+# 4. Obter nameservers para configurar no registrador do domínio
+aws route53 get-hosted-zone \
+  --id /hostedzone/SEU_HOSTED_ZONE_ID \
+  --query 'DelegationSet.NameServers' \
+  --output table
+```
+
+##### **Passo 2: Solicitar Certificado SSL**
+
+```bash
+# 1. Solicitar certificado wildcard para *.cartaosimples.com.br
+aws acm request-certificate \
+  --domain-name "*.cartaosimples.com.br" \
+  --subject-alternative-names "cartaosimples.com.br" \
+  --validation-method DNS \
+  --region us-east-1
+
+# 2. Anotar o Certificate ARN retornado
+# Exemplo: arn:aws:acm:us-east-1:123456789:certificate/abcd-1234-efgh-5678
+
+# 3. Obter registros DNS para validação
+aws acm describe-certificate \
+  --certificate-arn "SEU_CERTIFICATE_ARN" \
+  --region us-east-1 \
+  --query 'Certificate.DomainValidationOptions[*].ResourceRecord'
+```
+
+##### **Passo 3: Configurar CNAME para cdn.cartaosimples.com.br**
+
+**Pré-requisitos:**
+
+1. Possuir o domínio `cartaosimples.com.br`
+2. Certificado SSL válido no AWS Certificate Manager (ACM)
+3. Hosted Zone configurada no Route 53
+
+```bash
+# 1. Primeiro, obter o Hosted Zone ID do seu domínio
+aws route53 list-hosted-zones-by-name \
+  --dns-name cartaosimples.com.br \
+  --query 'HostedZones[0].Id' \
+  --output text
+
+# 2. Criar registro CNAME para cdn.cartaosimples.com.br
 aws route53 change-resource-record-sets \
-  --hosted-zone-id Z123456789 \
+  --hosted-zone-id /hostedzone/SEU_HOSTED_ZONE_ID \
   --change-batch '{
     "Changes": [{
-      "Action": "CREATE", 
+      "Action": "CREATE",
       "ResourceRecordSet": {
-        "Name": "cdn.cartaosimples.com",
+        "Name": "cdn.cartaosimples.com.br",
         "Type": "CNAME",
         "TTL": 300,
-        "ResourceRecords": [{"Value": "d111111abcdef8.cloudfront.net"}]
+        "ResourceRecords": [{"Value": "d2x7cg3k3on9lk.cloudfront.net"}]
       }
     }]
   }'
+
+# 3. Verificar se o registro foi criado
+aws route53 list-resource-record-sets \
+  --hosted-zone-id /hostedzone/SEU_HOSTED_ZONE_ID \
+  --query 'ResourceRecordSets[?Name==`cdn.cartaosimples.com.br.`]'
+
+# 4. Testar resolução DNS (aguarde alguns minutos)
+nslookup cdn.cartaosimples.com.br
+# Deve retornar: cdn.cartaosimples.com.br canonical name = d2x7cg3k3on9lk.cloudfront.net
 ```
+
+##### **Passo 4: Atualizar Distribuição CloudFront**
+
+```bash
+# 1. Obter configuração atual da distribuição
+aws cloudfront get-distribution-config \
+  --id EOLJNTE5PW5O9 > current-distribution.json
+
+# 2. Extrair apenas a configuração (sem metadados)
+cat current-distribution.json | jq '.DistributionConfig' > distribution-config.json
+
+# 3. Editar o arquivo distribution-config.json para adicionar:
+# - Aliases: ["cdn.cartaosimples.com.br"]
+# - ViewerCertificate com seu Certificate ARN
+# Exemplo de configuração necessária:
+cat > distribution-update.json << 'EOF'
+{
+  "Aliases": {
+    "Quantity": 1,
+    "Items": ["cdn.cartaosimples.com.br"]
+  },
+  "ViewerCertificate": {
+    "CloudFrontDefaultCertificate": false,
+    "ACMCertificateArn": "arn:aws:acm:us-east-1:ACCOUNT:certificate/CERT-ID",
+    "SSLSupportMethod": "sni-only",
+    "MinimumProtocolVersion": "TLSv1.2_2021"
+  }
+}
+EOF
+
+# 4. Obter ETag atual da distribuição
+ETAG=$(cat current-distribution.json | jq -r '.ETag')
+
+# 5. Atualizar a distribuição (após editar o arquivo)
+aws cloudfront update-distribution \
+  --id EOLJNTE5PW5O9 \
+  --distribution-config file://distribution-config.json \
+  --if-match "$ETAG"
+```
+
+##### **Passo 5: Verificações Finais**
+
+```bash
+# 1. Verificar status da distribuição
+aws cloudfront get-distribution \
+  --id EOLJNTE5PW5O9 \
+  --query 'Distribution.{Status:Status,Aliases:DistributionConfig.Aliases.Items}' \
+  --output table
+
+# 2. Aguardar deployment (pode levar 15-20 minutos)
+aws cloudfront wait distribution-deployed --id EOLJNTE5PW5O9
+
+# 3. Testar o domínio personalizado
+curl -I https://cdn.cartaosimples.com.br/
+curl -I https://cdn.cartaosimples.com.br/widget-bootstrap.v1.min.js
+
+# 4. Testar resolução DNS
+dig cdn.cartaosimples.com.br CNAME
+nslookup cdn.cartaosimples.com.br
+```
+
+#### **📋 Resumo Prático para cdn.cartaosimples.com.br**
+
+**Opção Rápida (sem domínio personalizado):**
+
+```bash
+# Use direto (funciona imediatamente):
+https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js
+```
+
+**Opção Completa (com cdn.cartaosimples.com.br):**
+
+1. **✅ Criar Hosted Zone:** `aws route53 create-hosted-zone --name cartaosimples.com.br`
+2. **✅ Solicitar Certificado SSL:** `aws acm request-certificate --domain-name "*.cartaosimples.com.br"`
+3. **✅ Validar Certificado:** Criar registros CNAME de validação no Route 53
+4. **✅ Criar CNAME:** `cdn.cartaosimples.com.br` → `d2x7cg3k3on9lk.cloudfront.net`
+5. **✅ Atualizar CloudFront:** Adicionar alias e certificado SSL
+6. **✅ Configurar Nameservers:** No registrador do domínio (onde comprou cartaosimples.com.br)
+
+**Custos Estimados:**
+
+- Hosted Zone Route 53: ~$0.50/mês
+- Certificado ACM: Gratuito
+- Queries DNS: ~$0.40 por milhão
+
+**Tempo Total:** 2-4 horas (incluindo propagação DNS)
+
+#### **Passo Extra: Certificado SSL para Domínio Personalizado**
+
+Se você quiser usar domínio personalizado, também precisa configurar certificado SSL:
+
+```bash
+# 1. Solicitar certificado SSL no ACM (deve ser em us-east-1 para CloudFront)
+aws acm request-certificate \
+  --domain-name cdn.cartaosimples.com \
+  --validation-method DNS \
+  --region us-east-1
+
+# 2. Obter informações para validação DNS
+aws acm describe-certificate \
+  --certificate-arn arn:aws:acm:us-east-1:ACCOUNT:certificate/CERT-ID \
+  --region us-east-1
+
+# 3. Após validação, atualizar CloudFront para usar certificado personalizado
+# (Isso requer modificação da distribuição CloudFront)
+```
+
+#### **Verificações de Status**
+
+```bash
+# Verificar status DNS
+dig cdn.cartaosimples.com CNAME
+
+# Verificar certificado SSL
+openssl s_client -connect cdn.cartaosimples.com:443 -servername cdn.cartaosimples.com
+
+# Testar HTTPS
+curl -I https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js
+```
+
+#### **📋 Como Obter os Valores Corretos**
+
+```bash
+# 1. Obter domínio da distribuição CloudFront
+aws cloudfront get-distribution \
+  --id EOLJNTE5PW5O9 \
+  --query 'Distribution.DomainName' \
+  --output text
+# Resultado: d2x7cg3k3on9lk.cloudfront.net
+
+# 2. Listar Hosted Zones disponíveis
+aws route53 list-hosted-zones \
+  --query 'HostedZones[*].{Name:Name,Id:Id}' \
+  --output table
+
+# 3. Obter Hosted Zone específica
+aws route53 list-hosted-zones-by-name \
+  --dns-name cartaosimples.com \
+  --query 'HostedZones[0].{Id:Id,Name:Name}' \
+  --output table
+```
+
+#### **⚠️ Considerações Importantes**
+
+1. **Certificado SSL**: Para usar domínio personalizado, é **obrigatório** ter certificado SSL válido
+2. **Região**: Certificados para CloudFront devem estar na região **us-east-1**
+3. **Propagação DNS**: Pode levar até 48 horas para propagar globalmente
+4. **Custos**: Certificados ACM são gratuitos, mas domínios Route 53 têm custo
+5. **Aliases**: Precisa reconfigurar a distribuição CloudFront para aceitar o domínio personalizado
 
 ---
 
@@ -324,35 +549,36 @@ aws route53 change-resource-record-sets \
 
 Após o deploy, as URLs ficam disponíveis:
 
-```
-Bootstrap: https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js (1.8KB)
-CDN Bundle: https://cdn.cartaosimples.com/widget.v1.min.js (122KB)  
-CSS: https://cdn.cartaosimples.com/widget.v1.min.css (4.6KB)
-```
-
-### 2. Integração Básica
+````
+Bootstrap: https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js (1.8KB)
+CDN Bundle: https://d2x7cg3k3on9lk.cloudfront.net/widget.v1.min.js (122KB)
+CSS: https://d2x7cg3k3on9lk.cloudfront.net/widget.v1.min.css (4.6KB)
+```### 2. Integração Básica
 
 ```html
 <!-- Método 1: Data attributes -->
-<script 
+<script
   src="https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js"
   data-merchant-id="merchant-123"
-  data-primary="#FF6600" 
+  data-primary="#FF6600"
   data-secondary="#0A0A0A"
   data-logo="https://seusite.com/logo.png"
   data-env="production"
-  async>
-</script>
-```
+  async
+></script>
+````
 
 ```html
 <!-- Método 2: Configuração JavaScript -->
-<script src="https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js" async></script>
+<script
+  src="https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js"
+  async
+></script>
 <script>
   window.PaymentWidgetInit = {
-    merchantId: 'merchant-123',
-    primaryColor: '#FF6600',
-    onSuccess: (data) => console.log('Sucesso:', data.token)
+    merchantId: "merchant-123",
+    primaryColor: "#FF6600",
+    onSuccess: (data) => console.log("Sucesso:", data.token),
   };
 </script>
 ```
@@ -361,17 +587,17 @@ CSS: https://cdn.cartaosimples.com/widget.v1.min.css (4.6KB)
 
 ```bash
 # Gerar hash SRI
-openssl dgst -sha384 -binary dist/bootstrap/widget-bootstrap.v1.min.umd.cjs | openssl base64 -A
+openssl dgst -sha384 -binary dist/bootstrap/widget-bootstrap.v1.min.js | openssl base64 -A
 ```
 
 ```html
 <!-- Uso com SRI -->
-<script 
+<script
   src="https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js"
   integrity="sha384-HASH_GERADO_AQUI"
   crossorigin="anonymous"
-  async>
-</script>
+  async
+></script>
 ```
 
 ### 4. Fallback e Redundância
@@ -379,13 +605,14 @@ openssl dgst -sha384 -binary dist/bootstrap/widget-bootstrap.v1.min.umd.cjs | op
 ```html
 <script>
   // Carregar com fallback
-  (function() {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js';
+  (function () {
+    var script = document.createElement("script");
+    script.src = "https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js";
     script.async = true;
-    script.onerror = function() {
+    script.onerror = function () {
       // Fallback para CDN alternativo
-      script.src = 'https://backup-cdn.cartaosimples.com/widget-bootstrap.v1.min.js';
+      script.src =
+        "https://backup-cdn.cartaosimples.com/widget-bootstrap.v1.min.js";
     };
     document.head.appendChild(script);
   })();
@@ -405,7 +632,7 @@ openssl dgst -sha384 -binary dist/bootstrap/widget-bootstrap.v1.min.umd.cjs | op
 # PATCH: Bug fixes (1.0.0 → 1.0.1)
 npm version patch
 
-# MINOR: New features (1.0.1 → 1.1.0)  
+# MINOR: New features (1.0.1 → 1.1.0)
 npm version minor
 
 # MAJOR: Breaking changes (1.1.0 → 2.0.0)
@@ -552,7 +779,7 @@ npm view cartao-simples-widget --json | jq '.downloads'
 ### Release
 
 - [ ] 📦 Build SDK publicado no npm
-- [ ] ☁️ CDN deployado no S3/CloudFront  
+- [ ] ☁️ CDN deployado no S3/CloudFront
 - [ ] 🚀 Bootstrap loader atualizado
 - [ ] 🏷️ Git tag criada e pushed
 - [ ] 📄 Release notes no GitHub
@@ -591,7 +818,7 @@ git push origin feature/minha-feature
 ### Code Review Checklist
 
 - [ ] 📝 Código segue style guide
-- [ ] 🧪 Testes adicionados/atualizados  
+- [ ] 🧪 Testes adicionados/atualizados
 - [ ] 📚 Documentação atualizada
 - [ ] 🔒 Sem vulnerabilidades de segurança
 - [ ] ⚡ Performance não degradada

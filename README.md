@@ -351,7 +351,20 @@ export default function CheckoutPage() {
 }
 ```
 
-## 🔍 Troubleshooting
+## � Documentação Completa
+
+Para informações detalhadas sobre deploy, configuração e troubleshooting, consulte a [documentação completa na pasta `docs/`](./docs/):
+
+- **[📖 Índice de Documentação](./docs/DOCS-INDEX.md)** - Navegação por todas as documentações
+- **[🚀 Quick Start](./docs/QUICK-START.md)** - Comece em 5 minutos
+- **[📦 Guia de Deploy CDN](./docs/GUIA-DEPLOY-CDN.md)** - Deploy completo no CloudFront
+- **[🎨 Guia de Uso do Widget](./docs/GUIA-USO-WIDGET.md)** - APIs e exemplos de integração
+- **[🔧 Solução CORS](./docs/SOLUCAO-CORS.md)** - Configuração CORS e troubleshooting
+- **[💻 Comandos Úteis](./docs/COMANDOS-UTEIS.md)** - Referência rápida de comandos
+- **[📊 Resumo Visual](./docs/RESUMO-VISUAL.md)** - Status e métricas do projeto
+- **[🌐 Servidor Local](./docs/SERVIDOR-LOCAL.md)** - Como testar localmente
+
+## �🔍 Troubleshooting
 
 ### Problemas Comuns
 
@@ -361,29 +374,23 @@ export default function CheckoutPage() {
 - Conferir console por erros de CORS
 - Verificar se o script carregou (`window.PaymentWidget` existe)
 
-**❌ Estilos quebrados**
+**❌ Erro "ERR_NAME_NOT_RESOLVED"**
 
-- Shadow DOM pode estar desabilitado
-- Verificar se CSS não está sendo sobrescrito
-- Testar fallback iframe
+- CDN URL incorreta - deve ser `https://d2x7cg3k3on9lk.cloudfront.net`
+- Verificar configuração em `src/bootstrap/index.ts`
 
-**❌ Validação falhando**
+**❌ Erro CORS**
 
-- Verificar formato de CPF/telefone/CEP
-- Conferir se todos campos obrigatórios estão preenchidos
-- Verificar idade mínima (18 anos)
+- Bucket S3 precisa ter CORS configurado
+- Executar `./deploy.sh` para aplicar automaticamente
+- Ver [documentação CORS](./docs/SOLUCAO-CORS.md)
 
-### Debug Mode
+**❌ Cache desatualizado**
 
-```javascript
-window.PaymentWidget.init({
-  merchantId: "test-123",
-  environment: "staging", // Habilita logs
-  onError: (error) => {
-    console.error("Debug:", error);
-  },
-});
-```
+- Invalidar cache do CloudFront: `aws cloudfront create-invalidation --distribution-id EOLJNTE5PW5O9 --paths "/*"`
+- Aguardar 1-2 minutos para propagação
+
+Para mais soluções, consulte o [Guia de Deploy CDN](./docs/GUIA-DEPLOY-CDN.md) completo.
 
 ## 🤝 Contribuição
 
