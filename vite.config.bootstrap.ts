@@ -32,5 +32,9 @@ export default defineConfig({
   },
   define: {
     "process.env.NODE_ENV": '"production"',
+    // Permite override da CDN URL via variável de ambiente
+    "import.meta.env.VITE_CDN_BASE_URL": JSON.stringify(
+      process.env.VITE_CDN_BASE_URL || ""
+    ),
   },
 });

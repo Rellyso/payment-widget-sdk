@@ -25,7 +25,9 @@ type InternalWidgetInstance = {
 };
 
 // URLs do CDN (CloudFront para production)
-const CDN_BASE_URL = "https://d2x7cg3k3on9lk.cloudfront.net";
+// Usa variável de ambiente se disponível, fallback para CloudFront production
+const CDN_BASE_URL =
+  import.meta.env.VITE_CDN_BASE_URL || "https://d2x7cg3k3on9lk.cloudfront.net";
 const WIDGET_BUNDLE_URL = `${CDN_BASE_URL}/widget.v1.min.js`;
 const WIDGET_CSS_URL = `${CDN_BASE_URL}/widget.v1.min.css`;
 const CONTAINER_ID_PREFIX = "__payment_widget_root__";
@@ -138,7 +140,7 @@ class PaymentWidgetBootstrap {
     const instance = this.state.instances.get(targetMerchantId);
     if (instance?.api) {
       instance.api.close();
-      
+
       // Desabilita interação com o container após fechar
       instance.container.style.pointerEvents = "none";
     }
@@ -342,7 +344,7 @@ class PaymentWidgetBootstrap {
       onClose: () => {
         // Desabilita pointer-events quando o modal fecha
         instance.container.style.pointerEvents = "none";
-        
+
         // Chama callback original se existir
         if (instance.config.onClose) {
           instance.config.onClose();

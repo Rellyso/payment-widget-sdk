@@ -36,6 +36,32 @@ Este projeto possui documentação completa e organizada. Use este índice para 
 
 **Use quando:** Você quer entender como o widget funciona em profundidade ou precisa da referência completa da API.
 
+### [CDN-CONFIGURATION.md](./CDN-CONFIGURATION.md) ⭐ **NOVO**
+
+**Configuração da URL do CDN via variáveis de ambiente.**
+
+- Como funciona o sistema de fallback
+- Override para desenvolvimento/staging
+- Build time replacement com Vite
+- Cenários de uso (dev/staging/prod)
+- Troubleshooting de problemas de CDN
+- Boas práticas
+
+**Use quando:** Você precisa usar URLs de CDN diferentes por ambiente ou quer entender como configurar o CDN_BASE_URL.
+
+### [VITE-ENV-VARIABLES.md](./VITE-ENV-VARIABLES.md) ⭐ **NOVO**
+
+**Guia completo sobre variáveis de ambiente no Vite.**
+
+- Diferença entre prefixo `VITE_` e sem prefixo
+- Quando usar `define` no vite.config.ts
+- Como funciona o build-time replacement
+- Exemplos práticos (simples, fallback, sem prefixo)
+- Armadilhas comuns e soluções
+- TypeScript types para variáveis de ambiente
+
+**Use quando:** Você vai adicionar novas variáveis de ambiente ou quer entender por que usamos `define` para algumas variáveis.
+
 ### [BOOTSTRAP-EXPLICACAO.md](./BOOTSTRAP-EXPLICACAO.md)
 
 **Explicação técnica detalhada do Bootstrap Loader.**
