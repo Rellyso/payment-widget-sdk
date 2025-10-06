@@ -55,6 +55,46 @@ Este projeto possui documentação completa e organizada. Use este índice para 
 
 ## 🏗️ Para Deploy e Infraestrutura
 
+### [CLOUDFRONT-SETUP.md](./CLOUDFRONT-SETUP.md) ⭐ **NOVO**
+
+**Guia completo de configuração do CloudFront (primeira vez).**
+
+- Setup automático com `setup-cloudfront.sh`
+- Setup manual passo a passo
+- Configuração de OAI (Origin Access Identity)
+- Criação de distribuição CloudFront
+- Políticas de cache otimizadas
+- Validação e testes
+- Estimativas de custo (~$3-5/mês)
+- Troubleshooting CloudFront
+
+**Use quando:** É a primeira vez que você vai fazer deploy em produção e precisa configurar o CloudFront.
+
+### [RESUMO-CLOUDFRONT.md](./RESUMO-CLOUDFRONT.md) ⭐ **NOVO**
+
+**Resumo executivo da configuração CloudFront.**
+
+- Arquivos criados pelo setup
+- Fluxo completo de uso
+- Checklist de setup
+- Custos detalhados
+- Próximos passos após configuração
+
+**Use quando:** Você acabou de executar o setup do CloudFront e quer entender o que foi criado.
+
+### [DEPLOY-GUIDE.md](./DEPLOY-GUIDE.md)
+
+**Guia prático de deploy (após CloudFront configurado).**
+
+- Pré-requisitos
+- Deploy completo automatizado
+- Deploy manual passo a passo
+- Testes em staging
+- Checklist de deploy
+- Troubleshooting
+
+**Use quando:** CloudFront já está configurado e você precisa fazer deploy dos arquivos.
+
 ### [GUIA-DEPLOY-CDN.md](./GUIA-DEPLOY-CDN.md)
 
 **Guia completo e didático explicando toda a infraestrutura.**
@@ -145,22 +185,34 @@ QUICK-START.md → Testar localmente → README.md
 README.md (seção "Como Usar") → examples/exemplo-completo.html
 ```
 
-### 3️⃣ Vai fazer deploy?
+### 3️⃣ Primeira vez fazendo deploy em produção?
 
 ```
-GUIA-DEPLOY-CDN.md → deploy.sh → examples/cloudfront-test.html
+CLOUDFRONT-SETUP.md → setup-cloudfront.sh → DEPLOY-GUIDE.md → deploy.sh
 ```
 
-### 4️⃣ Vai publicar no npm?
+### 4️⃣ Deploy regular (CloudFront já configurado)?
+
+```
+deploy.sh production → examples/cloudfront-test.html
+```
+
+### 5️⃣ Deploy em staging?
+
+```
+deploy.sh staging → examples/test-staging.html
+```
+
+### 6️⃣ Vai publicar no npm?
 
 ```
 PUBLISHING.md → npm publish
 ```
 
-### 5️⃣ Algo deu errado?
+### 7️⃣ Algo deu errado?
 
 ```
-README.md (Troubleshooting) → GUIA-DEPLOY-CDN.md (Troubleshooting)
+README.md (Troubleshooting) → CLOUDFRONT-SETUP.md (Troubleshooting)
 ```
 
 ---
@@ -191,6 +243,10 @@ README.md (Troubleshooting) → GUIA-DEPLOY-CDN.md (Troubleshooting)
 
 → **[README.md](./README.md)** → Seção "Uso como SDK npm"
 
+### Primeira vez fazendo deploy em produção
+
+→ **[CLOUDFRONT-SETUP.md](./CLOUDFRONT-SETUP.md)** → Setup automático
+
 ### Preciso entender a arquitetura
 
 → **[GUIA-DEPLOY-CDN.md](./GUIA-DEPLOY-CDN.md)** → Seção "Arquitetura da Solução"
@@ -203,9 +259,13 @@ README.md (Troubleshooting) → GUIA-DEPLOY-CDN.md (Troubleshooting)
 
 → **[README.md](./README.md)** → Seção "Desenvolvimento Local"
 
+### CloudFront setup falhou
+
+→ **[CLOUDFRONT-SETUP.md](./CLOUDFRONT-SETUP.md)** → Seção "Troubleshooting"
+
 ### Deploy falhou com erro
 
-→ **[GUIA-DEPLOY-CDN.md](./GUIA-DEPLOY-CDN.md)** → Seção "Troubleshooting"
+→ **[DEPLOY-GUIDE.md](./DEPLOY-GUIDE.md)** → Seção "Troubleshooting"
 
 ### Quero configurar domínio customizado
 
@@ -213,11 +273,15 @@ README.md (Troubleshooting) → GUIA-DEPLOY-CDN.md (Troubleshooting)
 
 ### Erro 404 no CloudFront
 
-→ **[GUIA-DEPLOY-CDN.md](./GUIA-DEPLOY-CDN.md)** → "Problema 4: Bucket S3 errado"
+→ **[CLOUDFRONT-SETUP.md](./CLOUDFRONT-SETUP.md)** → Verificar distribuição
 
 ### Widget não aparece no site
 
 → **[README.md](./README.md)** → Seção "Troubleshooting"
+
+### Quanto vai custar o CloudFront?
+
+→ **[RESUMO-CLOUDFRONT.md](./RESUMO-CLOUDFRONT.md)** → Seção "Custos Estimados"
 
 ---
 
@@ -231,11 +295,25 @@ README.md (Troubleshooting) → GUIA-DEPLOY-CDN.md (Troubleshooting)
 
 ## ✅ Checklist Rápido
 
-Antes de usar em produção, verifique:
+### Antes de usar em produção
+
+**Setup Inicial:**
 
 - [ ] Li o [QUICK-START.md](./QUICK-START.md) e testei localmente
 - [ ] Entendi a API completa no [README.md](./README.md)
-- [ ] Fiz deploy seguindo [GUIA-DEPLOY-CDN.md](./GUIA-DEPLOY-CDN.md)
+- [ ] AWS CLI instalado e configurado
+- [ ] `jq` instalado (`brew install jq`)
+
+**Configuração CloudFront (Primeira Vez):**
+
+- [ ] Executei `./setup-cloudfront.sh production`
+- [ ] Verifiquei `cloudfront-setup-report.txt`
+- [ ] Anotei Domain Name do CloudFront
+- [ ] Aguardei deploy da distribuição (15-30 min)
+
+**Deploy e Testes:**
+
+- [ ] Executei `./deploy.sh production`
 - [ ] Testei os endpoints com [cloudfront-test.html](./examples/cloudfront-test.html)
 - [ ] Testei integração com [exemplo-completo.html](./examples/exemplo-completo.html)
 - [ ] Configurei callbacks `onSuccess` e `onError`
@@ -243,6 +321,13 @@ Antes de usar em produção, verifique:
 - [ ] Testei em mobile
 - [ ] Configurei ambiente de staging
 - [ ] Documentei minha integração
+
+**Pós-Deploy:**
+
+- [ ] Verifiquei console sem erros
+- [ ] Modal abre e fecha corretamente
+- [ ] Estilos aplicados (Shadow DOM)
+- [ ] Commit e push dos arquivos
 
 ---
 

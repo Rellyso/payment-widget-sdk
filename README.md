@@ -351,18 +351,45 @@ export default function CheckoutPage() {
 }
 ```
 
-## � Documentação Completa
+## 📚 Documentação Completa
 
 Para informações detalhadas sobre deploy, configuração e troubleshooting, consulte a [documentação completa na pasta `docs/`](./docs/):
 
 - **[📖 Índice de Documentação](./docs/DOCS-INDEX.md)** - Navegação por todas as documentações
 - **[🚀 Quick Start](./docs/QUICK-START.md)** - Comece em 5 minutos
 - **[📦 Guia de Deploy CDN](./docs/GUIA-DEPLOY-CDN.md)** - Deploy completo no CloudFront
+- **[☁️ Configuração CloudFront](./docs/CLOUDFRONT-SETUP.md)** - **NOVO!** Setup automático e manual
 - **[🎨 Guia de Uso do Widget](./docs/GUIA-USO-WIDGET.md)** - APIs e exemplos de integração
 - **[🔧 Solução CORS](./docs/SOLUCAO-CORS.md)** - Configuração CORS e troubleshooting
 - **[💻 Comandos Úteis](./docs/COMANDOS-UTEIS.md)** - Referência rápida de comandos
 - **[📊 Resumo Visual](./docs/RESUMO-VISUAL.md)** - Status e métricas do projeto
 - **[🌐 Servidor Local](./docs/SERVIDOR-LOCAL.md)** - Como testar localmente
+
+## 🚀 Deploy Rápido
+
+### Primeira Vez (Production)
+
+```bash
+# 1. Configure o CloudFront (apenas primeira vez)
+./setup-cloudfront.sh production
+
+# 2. Faça o deploy
+./deploy.sh production
+```
+
+### Staging (Desenvolvimento)
+
+```bash
+# Deploy direto no S3 (sem CloudFront)
+./deploy.sh staging
+```
+
+O script `setup-cloudfront.sh` automaticamente:
+
+- ✅ Cria Origin Access Identity (OAI)
+- ✅ Cria distribuição CloudFront
+- ✅ Configura bucket S3
+- ✅ Gera relatório com URLs e próximos passos
 
 ## �🔍 Troubleshooting
 

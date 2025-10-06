@@ -6,6 +6,22 @@
 2. **Node.js** 18+ instalado
 3. **jq** instalado (`brew install jq`)
 4. **Permissões AWS**: S3 e CloudFront
+5. **CloudFront configurado** (veja [CLOUDFRONT-SETUP.md](./CLOUDFRONT-SETUP.md))
+
+---
+
+## ⚠️ Primeira Vez? Configure o CloudFront
+
+Se esta é sua primeira vez fazendo deploy em **production**, você precisa configurar o CloudFront primeiro:
+
+```bash
+# Configuração automática (recomendado)
+./setup-cloudfront.sh production
+```
+
+Ou siga o [guia manual de configuração do CloudFront](./CLOUDFRONT-SETUP.md).
+
+**Staging** não precisa de CloudFront (usa S3 direto).
 
 ---
 
