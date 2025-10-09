@@ -62,6 +62,41 @@ Este projeto possui documentação completa e organizada. Use este índice para 
 
 **Use quando:** Você vai adicionar novas variáveis de ambiente ou quer entender por que usamos `define` para algumas variáveis.
 
+### [TOKENIZACAO.md](./TOKENIZACAO.md) ⭐ **NOVO**
+
+**Guia completo de tokenização de cartão de crédito.**
+
+- O que é tokenização e por que usar
+- 2 arquiteturas: Backend vs API Pública (JavaScript)
+- Implementação completa passo a passo
+- Serviço de tokenização com validação Luhn
+- Comparação das abordagens
+- Segurança do token (expiração, uso único)
+- Exemplo completo de integração
+
+**Use quando:** Você precisa entender como gerar e usar tokens de cartão de forma segura, ou quer implementar a tokenização no widget.
+
+### [PAYMENT-FORM.md](./PAYMENT-FORM.md) ⭐ **NOVO**
+
+**Documentação completa do formulário de pagamento (PaymentFormStep).**
+
+- Visão geral do componente
+- Funcionalidades (máscaras, validação, detecção de bandeira)
+- Fluxo de tokenização detalhado com diagrama
+- Validações (Luhn, expiry, CVV, nome)
+- Estrutura do componente
+- Integração com APIs (endpoints, requests, responses)
+- Exemplos de uso (básico, backend customizado, múltiplos comerciantes)
+- Segurança (boas práticas, o que nunca fazer, checklist)
+- Callbacks e eventos
+- Performance e métricas
+- Acessibilidade (WCAG 2.1 AA)
+- Números de teste
+- Troubleshooting
+- Roadmap de funcionalidades
+
+**Use quando:** Você precisa entender como funciona o formulário de pagamento, integrar com APIs de tokenização/pagamento, ou customizar validações.
+
 ### [BOOTSTRAP-EXPLICACAO.md](./BOOTSTRAP-EXPLICACAO.md)
 
 **Explicação técnica detalhada do Bootstrap Loader.**
@@ -178,7 +213,38 @@ Este projeto possui documentação completa e organizada. Use este índice para 
 
 ---
 
-## 🛠️ Arquivos de Configuração
+## � Segurança
+
+### [SEGURANCA-E-SECRETS.md](./SEGURANCA-E-SECRETS.md) ⭐ **NOVO**
+
+**Guia completo de segurança e gerenciamento de secrets.**
+
+- Regra de ouro: nunca expor secrets no frontend
+- Arquitetura segura (Widget → Backend → API)
+- O que PODE e o que NUNCA pode ficar no frontend
+- Implementação correta passo a passo
+- Tipos de tokens e keys (public vs secret)
+- Camadas de segurança (HTTPS, CORS, Rate Limiting, etc)
+- Checklist de segurança completo
+- O que fazer se API key vazar
+- Princípios de segurança (menor privilégio, defesa em profundidade)
+
+**Use quando:** Você precisa entender como proteger API keys e secrets, ou quer implementar o fluxo de pagamento de forma segura.
+
+### [examples/security/](../examples/security/)
+
+**Exemplos práticos de integração segura.**
+
+- `nextjs-integration.tsx` - Integração completa com Next.js
+- `express-backend.ts` - Backend seguro com Express
+- `merchant-validation.ts` - Sistema de validação de merchants
+- Todos com código comentado e boas práticas
+
+**Use quando:** Você precisa de um exemplo real de implementação segura para copiar e adaptar.
+
+---
+
+## �🛠️ Arquivos de Configuração
 
 ### Vite Configs
 
