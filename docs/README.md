@@ -6,6 +6,7 @@ Bem-vindo à documentação completa do Payment Widget! Aqui você encontra tudo
 
 ### 🚀 Começando
 
+- **[Como criar o Widget do zero](./GUIA-CRIAR-WIDGET-DO-ZERO.md)** - Veja como implementar o Widget de pagamento e distribuir como CDN na aws e SDK na NPM
 - **[Quick Start](./QUICK-START.md)** - Integre o widget em 5 minutos
 - **[Guia de Uso do Widget](./GUIA-USO-WIDGET.md)** - APIs, exemplos e boas práticas
 
