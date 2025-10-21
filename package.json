@@ -58,12 +58,14 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run build:sdk && npm run build:cdn && npm run build:bootstrap",
+    "build:site": "vite build --config vite.config.ts",
     "build:sdk": "vite build --config vite.config.sdk.ts",
     "build:cdn": "vite build --config vite.config.cdn.ts",
     "build:bootstrap": "vite build --config vite.config.bootstrap.ts",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "preview": "vite preview",
+    "preview:site": "vite preview --config vite.config.ts --port 4173 --strictPort",
     "type-check": "tsc --noEmit",
     "deploy:staging": "./deploy.sh staging",
     "deploy:production": "./deploy.sh production"
