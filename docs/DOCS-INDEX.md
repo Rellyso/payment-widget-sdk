@@ -36,6 +36,24 @@ Este projeto possui documentação completa e organizada. Use este índice para 
 
 **Use quando:** Você quer entender como o widget funciona em profundidade ou precisa da referência completa da API.
 
+### [GUIA-CRIAR-WIDGET-DO-ZERO.md](./GUIA-CRIAR-WIDGET-DO-ZERO.md) ⭐ **NOVO**
+
+**Guia completo para criar um Payment Widget do zero.**
+
+- Introdução e conceitos (SDK vs CDN vs Bootstrap)
+- Arquitetura e decisões técnicas (por que React, Vite, Shadow DOM)
+- Configuração inicial do projeto (setup passo a passo)
+- Estrutura de build múltiplo (SDK, CDN, Bootstrap)
+- Implementação completa do widget
+- Shadow DOM e isolamento de estilos
+- Sistema de build com Vite
+- Deploy e distribuição (NPM, S3, CloudFront)
+- Segurança e boas práticas
+- Testes e validação
+- Checklist completo
+
+**Use quando:** Você quer criar um widget embarcável do zero ou entender profundamente as decisões arquiteturais do projeto.
+
 ### [CDN-CONFIGURATION.md](./CDN-CONFIGURATION.md) ⭐ **NOVO**
 
 **Configuração da URL do CDN via variáveis de ambiente.**
@@ -155,6 +173,20 @@ Este projeto possui documentação completa e organizada. Use este índice para 
 - Troubleshooting
 
 **Use quando:** CloudFront já está configurado e você precisa fazer deploy dos arquivos.
+
+### [AWS-CLI-SETUP.md](./AWS-CLI-SETUP.md) ⭐ **NOVO**
+
+**Guia de configuração do AWS CLI (macOS + fish) para este projeto.**
+
+- Instalação com Homebrew ou instalador oficial
+- Perfis nomeados (staging/prod) com Access Key ou SSO
+- Variáveis de ambiente no fish (AWS_PROFILE, AWS_REGION, AWS_PAGER)
+- Policies IAM mínimas para S3 e CloudFront
+- Sanity checks (STS, S3, CloudFront)
+- Como usar com `deploy.sh` e `setup-cloudfront.sh`
+- Troubleshooting de credenciais, permissões e região
+
+**Use quando:** Você precisa preparar o ambiente AWS local para fazer deploy.
 
 ### [GUIA-DEPLOY-CDN.md](./GUIA-DEPLOY-CDN.md)
 
@@ -334,6 +366,10 @@ README.md (Troubleshooting) → CLOUDFRONT-SETUP.md (Troubleshooting)
 ### Estou criando uma integração React/Vue
 
 → **[README.md](./README.md)** → Seção "Uso como SDK npm"
+
+### Quero criar um widget parecido do zero
+
+→ **[GUIA-CRIAR-WIDGET-DO-ZERO.md](./GUIA-CRIAR-WIDGET-DO-ZERO.md)** → Guia completo passo a passo ⭐ **NOVO**
 
 ### Primeira vez fazendo deploy em produção
 
