@@ -17,7 +17,7 @@ type ThemeProviderProps = {
 };
 
 export function ThemeProvider({ config, children }: ThemeProviderProps) {
-  const primaryColor = config.theme?.primaryColor || "#ff6600";
+  const primaryColor = config.theme?.primaryColor || "#3a36f5";
   const secondaryColor = config.theme?.secondaryColor || "#0a0a0a";
   const borderRadius = parseBorderRadius(config.theme?.borderRadius || "md");
 
