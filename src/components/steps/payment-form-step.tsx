@@ -1,8 +1,18 @@
 import { useState } from "react";
 import { logger } from "../../utils/logger";
 import { cleanValue, getCardBrand } from "../../utils/masks";
-import { Input } from "../Input";
+import { Button } from "../ui/button";
+import { Combobox } from "../ui/combobox";
+import { Input } from "../ui/input";
 import type { StepProps } from "./types";
+import { VisaIcon } from "../icons/visa";
+import { MastercardIcon } from "../icons/mastercard";
+import { AmexIcon } from "../icons/amex";
+import { DinersIcon } from "../icons/diners";
+import { EloIcon } from "../icons/elo";
+import { HipercardIcon } from "../icons/hipercard";
+import { CreditCard } from "lucide-react";
+import { WIDGET_STEPS, type Option } from '@/types/index';
 
 // Constantes de validação
 const MIN_CARD_NUMBER_LENGTH = 13;
@@ -12,10 +22,18 @@ const MIN_CVV_LENGTH = 3;
 const MAX_CVV_LENGTH = 4;
 const MIN_MONTH = 1;
 const MAX_MONTH = 12;
-const YEAR_BASE = 2000;
 const LUHN_DIGIT_THRESHOLD = 9;
 const LUHN_SUBTRACT = 9;
 const LUHN_MOD = 10;
+
+const installmentOptions: Map<string, Option> = new Map([
+  ["1", { value: 1, label: '1x de R$ 100,00'}],
+  ["2", { value: 2, label: '2x de R$ 50,00'}],
+  ["3", { value: 3, label: '3x de R$ 33,33'}],
+  ["4", { value: 4, label: '4x de R$ 25,00'}],
+  ["5", { value: 5, label: '5x de R$ 20,00'}],
+  ["6", { value: 6, label: '6x de R$ 16,67'}],
+])
 
 type CardFormData = {
   cardNumber: string;
@@ -29,25 +47,30 @@ type CardFormErrors = Partial<Record<keyof CardFormData, string>>;
 
 // Ícones de bandeira de cartão (fora do componente)
 const CardBrandIcon = ({ brand }: { brand: string }) => {
-  const icons: Record<string, string> = {
-    visa: "💳",
-    mastercard: "💳",
-    amex: "💳",
-    discover: "💳",
-    jcb: "💳",
-    unknown: "💳",
-  };
-
-  return <span className="text-2xl">{icons[brand] || icons.unknown}</span>;
+  switch (brand) {
+    case "visa":
+      return <VisaIcon />;
+    case "mastercard":
+      return <MastercardIcon />;
+    case "amex":
+      return <AmexIcon />;
+    case "diners":
+      return <DinersIcon />;
+    case "elo":
+      return <EloIcon />;
+    case "hipercard":
+      return <HipercardIcon />;
+    default:
+      return <CreditCard className="text-primary" />;
+  }
 };
-
-export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
+export function PaymentFormStep({ onNext, config }: StepProps) {
   const [formData, setFormData] = useState<CardFormData>({
     cardNumber: "",
     cardholderName: "",
     expiryDate: "",
     cvv: "",
-    installments: 1,
+    installments: 0,
   });
 
   const [errors, setErrors] = useState<CardFormErrors>({});
@@ -131,7 +154,7 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
 
     const [month, year] = expiryDate.split("/");
     const monthNum = Number.parseInt(month, 10);
-    const yearNum = YEAR_BASE + Number.parseInt(year, 10);
+    const yearNum = Number.parseInt(year, 10);
 
     if (monthNum < MIN_MONTH || monthNum > MAX_MONTH) {
       return "Mês inválido";
@@ -194,57 +217,58 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    onNext(WIDGET_STEPS.CONFIRMATION)
+    // if (!validateForm()) {
+    //   return;
+    // }
 
-    setIsLoading(true);
+    // setIsLoading(true);
 
-    try {
-      // 1. Tokenizar cartão
-      const tokenResult = await tokenizeCard();
+    // try {
+    //   // 1. Tokenizar cartão
+    //   const tokenResult = await tokenizeCard();
 
-      logger.info("[Payment] Token gerado:", tokenResult.token);
+    //   logger.info("[Payment] Token gerado:", tokenResult.token);
 
-      // 2. Processar pagamento com token
-      const paymentResult = await processPayment(tokenResult.token);
+    //   // 2. Processar pagamento com token
+    //   const paymentResult = await processPayment(tokenResult.token);
 
-      logger.info("[Payment] Pagamento processado:", paymentResult);
+    //   logger.info("[Payment] Pagamento processado:", paymentResult);
 
-      // 3. Callback de sucesso
-      if (config?.onSuccess) {
-        config.onSuccess({
-          transactionId: paymentResult.transactionId,
-          token: tokenResult.token,
-          merchantId: config.merchantId,
-          installments: formData.installments,
-          timestamp: new Date().toISOString(),
-        });
-      }
+    //   // 3. Callback de sucesso
+    //   if (config?.onSuccess) {
+    //     config.onSuccess({
+    //       transactionId: paymentResult.transactionId,
+    //       token: tokenResult.token,
+    //       orderId: config.orderId,
+    //       installments: formData.installments,
+    //       timestamp: new Date().toISOString(),
+    //     });
+    //   }
 
-      // 4. Avançar para confirmação
-      onNext("confirmation");
-    } catch (error) {
-      logger.error("[Payment] Erro:", error);
+    //   // 4. Avançar para confirmação
+    //   onNext("confirmation");
+    // } catch (error) {
+    //   logger.error("[Payment] Erro:", error);
 
-      const errorMessage =
-        error instanceof Error ? error.message : "Erro ao processar pagamento";
+    //   const errorMessage =
+    //     error instanceof Error ? error.message : "Erro ao processar pagamento";
 
-      // Callback de erro
-      if (config?.onError) {
-        config.onError({
-          code: "PAYMENT_ERROR",
-          message: errorMessage,
-        });
-      }
+    //   // Callback de erro
+    //   if (config?.onError) {
+    //     config.onError({
+    //       code: "PAYMENT_ERROR",
+    //       message: errorMessage,
+    //     });
+    //   }
 
-      // Mostrar erro no formulário
-      setErrors({
-        cardNumber: errorMessage,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    //   // Mostrar erro no formulário
+    //   setErrors({
+    //     cardNumber: errorMessage,
+    //   });
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   // Tokeniza dados do cartão via API
@@ -300,7 +324,7 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
       },
       body: JSON.stringify({
         token,
-        merchantId: config?.merchantId,
+        orderId: config?.orderId,
         amount: 10_000, // TODO: Pegar do contexto
         installments: formData.installments,
       }),
@@ -324,12 +348,13 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
-      <div className="text-center">
-        <h3 className="mb-2 font-semibold text-gray-900 text-lg">
-          Dados de Pagamento
+      <div>
+        <h3 className="mb-2 font-bold text-black-001 text-xl">
+          Dados do Pagamento
         </h3>
-        <p className="text-gray-600 text-sm">
-          Informe os dados do cartão para primeira compra
+        <p className="text-black-002 text-base">
+          Digite os dados do cartão e selecione como prefere parcelar sua
+          compra.
         </p>
       </div>
 
@@ -353,13 +378,13 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
         <Input
           autoComplete="cc-name"
           error={errors.cardholderName}
-          label="Nome do Titular"
+          label="Nome no cartão"
           maxLength={100}
           name="cardholderName"
           onChange={(e) =>
             updateField("cardholderName", e.target.value.toUpperCase())
           }
-          placeholder="NOME COMO NO CARTÃO"
+          placeholder="Digite aqui..."
           required
           value={formData.cardholderName}
         />
@@ -369,12 +394,12 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
           <Input
             autoComplete="cc-exp"
             error={errors.expiryDate}
-            label="Validade"
+            label="Data de expiração"
             mask="expiryDate"
-            maxLength={5}
+            maxLength={7}
             name="expiryDate"
             onChange={(e) => updateField("expiryDate", e.target.value)}
-            placeholder="MM/AA"
+            placeholder="mm/aaaa"
             required
             value={formData.expiryDate}
           />
@@ -384,67 +409,32 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
             autoComplete="cc-csc"
             error={errors.cvv}
             inputMode="numeric"
-            label="CVV"
+            label="Código de segurança (CVV)"
             mask="cvv"
             maxLength={4}
             name="cvv"
             onChange={(e) => updateField("cvv", e.target.value)}
             placeholder="000"
             required
-            type="password"
             value={formData.cvv}
           />
         </div>
 
         {/* Parcelas */}
-        <div className="space-y-1">
-          <label
-            className="font-medium text-gray-700 text-sm"
-            htmlFor="installments"
-          >
-            Parcelamento
-          </label>
-          <select
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
-            id="installments"
-            name="installments"
-            onChange={(e) =>
-              updateField("installments", Number.parseInt(e.target.value, 10))
-            }
-            value={formData.installments}
-          >
-            <option value={1}>À vista - R$ 100,00</option>
-            <option value={2}>2x de R$ 50,00</option>
-            <option value={3}>3x de R$ 33,33</option>
-            <option value={4}>4x de R$ 25,00</option>
-            <option value={5}>5x de R$ 20,00</option>
-            <option value={6}>6x de R$ 16,67</option>
-          </select>
-        </div>
-
-        {/* Aviso de Segurança */}
-        <div className="rounded-lg bg-green-50 p-3 text-center">
-          <p className="text-green-800 text-sm">
-            🔒 Seus dados estão protegidos e criptografados
-          </p>
-        </div>
+        <Combobox
+          value={formData.installments}
+          onChange={(value) => updateField("installments", Number(value))}
+          preserveValueType={true}
+          searchPlaceholder="Pesquise a parcela"
+          options={installmentOptions}
+          placeholder="Selecione"
+          label="Quantidade de parcelas"
+        />
       </div>
 
       {/* Botões */}
-      <div className="flex justify-between gap-4">
-        <button
-          className="flex-1 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isLoading}
-          onClick={onPrev}
-          type="button"
-        >
-          Voltar
-        </button>
-        <button
-          className="flex-1 rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isLoading}
-          type="submit"
-        >
+      <div className="flex">
+        <Button className="w-full" disabled={isLoading} type="submit">
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
               <svg
@@ -472,9 +462,9 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
               Processando...
             </span>
           ) : (
-            "Finalizar Pagamento"
+            "Concluir compra"
           )}
-        </button>
+        </Button>
       </div>
     </form>
   );
