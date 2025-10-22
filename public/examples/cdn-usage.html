@@ -1,207 +1,226 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Payment Widget - CDN Example</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Widget - CDN Example</title>
+        <!-- CSS do widget -->
+        <link rel="stylesheet" href="../dist/cdn/widget.v1.min.css" />
 
-  <!-- CSS do widget -->
-  <link rel="stylesheet" href="../dist/cdn/widget.v1.min.css">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
+            .example-section {
+                margin: 20px 0;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+            }
 
-    .example-section {
-      margin: 20px 0;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
+            button {
+                background: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin: 5px;
+            }
 
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin: 5px;
-    }
+            button:hover {
+                background: #0056b3;
+            }
 
-    button:hover {
-      background: #0056b3;
-    }
+            #widget-container {
+                border: 2px dashed #ccc;
+                padding: 20px;
+                margin: 20px 0;
+                min-height: 100px;
+                text-align: center;
+            }
+        </style>
+    </head>
 
-    #widget-container {
-      border: 2px dashed #ccc;
-      padding: 20px;
-      margin: 20px 0;
-      min-height: 100px;
-      text-align: center;
-    }
-  </style>
-</head>
+    <body>
+        <h1>Payment Widget - CDN Integration</h1>
 
-<body>
-  <h1>Payment Widget - CDN Integration</h1>
+        <div class="example-section">
+            <h2>1. Usando API Global (Recomendado)</h2>
+            <p>
+                O React está incluído no bundle, não precisa carregar
+                separadamente!
+            </p>
 
-  <div class="example-section">
-    <h2>1. Usando API Global (Recomendado)</h2>
-    <p>O React está incluído no bundle, não precisa carregar separadamente!</p>
+            <div id="widget-container">
+                <p>Widget será montado aqui...</p>
+            </div>
 
-    <div id="widget-container">
-      <p>Widget será montado aqui...</p>
-    </div>
+            <button onclick="mountWidget()">Montar Widget</button>
+            <button onclick="openWidget()">Abrir</button>
+            <button onclick="closeWidget()">Fechar</button>
+            <button onclick="destroyWidget()">Destruir</button>
+        </div>
 
-    <button onclick="mountWidget()">Montar Widget</button>
-    <button onclick="openWidget()">Abrir</button>
-    <button onclick="closeWidget()">Fechar</button>
-    <button onclick="destroyWidget()">Destruir</button>
-  </div>
+        <div class="example-section">
+            <h2>2. Via API Global Direta</h2>
+            <p>Controlando via window.PaymentWidget_orderId</p>
 
-  <div class="example-section">
-    <h2>2. Via API Global Direta</h2>
-    <p>Controlando via window.PaymentWidget_merchantId</p>
+            <button onclick="openViaGlobalAPI()">Abrir via Global API</button>
+            <button onclick="closeViaGlobalAPI()">Fechar via Global API</button>
+            <button onclick="getStateViaGlobalAPI()">Ver Estado</button>
+        </div>
 
-    <button onclick="openViaGlobalAPI()">Abrir via Global API</button>
-    <button onclick="closeViaGlobalAPI()">Fechar via Global API</button>
-    <button onclick="getStateViaGlobalAPI()">Ver Estado</button>
-  </div>
+        <!-- JavaScript do widget - APENAS UM ARQUIVO! -->
+        <script src="../dist/cdn/widget.v1.min.umd.cjs"></script>
 
-  <!-- JavaScript do widget - APENAS UM ARQUIVO! -->
-  <script src="../dist/cdn/widget.v1.min.umd.cjs"></script>
+        <script>
+            let widgetInstance = null;
 
-  <script>
-    let widgetInstance = null;
+            // Configuração do widget
+            const widgetConfig = {
+                orderId: "demo123",
+                apiKey: "demo-api-key",
+                environment: "sandbox",
+                theme: {
+                    primaryColor: "#007bff",
+                    borderRadius: "8px",
+                },
+                logoUrl: "https://www.cartaosimples.com.br/logo-extendida.svg",
+                onOpen: () => console.log("✅ Widget aberto"),
+                onClose: () => console.log("❌ Widget fechado"),
+                onSuccess: (data) => {
+                    console.log("🎉 Pagamento realizado:", data);
+                    alert("Pagamento realizado com sucesso!");
+                },
+                onError: (error) => {
+                    console.error("❌ Erro:", error);
+                    alert("Erro: " + error.message);
+                },
+            };
 
-    // Configuração do widget
-    const widgetConfig = {
-      merchantId: 'demo123',
-      apiKey: 'demo-api-key',
-      environment: 'sandbox',
-      theme: {
-        primaryColor: '#007bff',
-        borderRadius: '8px'
-      },
-      logoUrl: "https://www.cartaosimples.com.br/logo-extendida.svg",
-      onOpen: () => console.log('✅ Widget aberto'),
-      onClose: () => console.log('❌ Widget fechado'),
-      onSuccess: (data) => {
-        console.log('🎉 Pagamento realizado:', data);
-        alert('Pagamento realizado com sucesso!');
-      },
-      onError: (error) => {
-        console.error('❌ Erro:', error);
-        alert('Erro: ' + error.message);
-      }
-    };
+            // 1. Montar widget usando a API do CDN
+            function mountWidget() {
+                const container = document.getElementById("widget-container");
 
-    // 1. Montar widget usando a API do CDN
-    function mountWidget() {
-      const container = document.getElementById('widget-container');
+                console.log("🔧 Tentando montar widget...", {
+                    container,
+                    config: widgetConfig,
+                    CartaoSimplesWidget: window.CartaoSimplesWidget,
+                });
 
-      console.log('🔧 Tentando montar widget...', {
-        container,
-        config: widgetConfig,
-        CartaoSimplesWidget: window.CartaoSimplesWidget
-      });
+                try {
+                    widgetInstance = CartaoSimplesWidget.mount(
+                        container,
+                        widgetConfig,
+                    );
+                    console.log(
+                        "✅ Widget montado com sucesso!",
+                        widgetInstance,
+                    );
+                    container.style.border = "2px solid green";
+                } catch (error) {
+                    console.error("❌ Erro ao montar widget:", error);
+                    container.innerHTML = `<p style="color: red;">❌ Erro: ${error.message}</p>`;
+                }
+            }
 
-      try {
-        widgetInstance = CartaoSimplesWidget.mount(container, widgetConfig);
-        console.log('✅ Widget montado com sucesso!', widgetInstance);
-        container.style.border = '2px solid green';
-      } catch (error) {
-        console.error('❌ Erro ao montar widget:', error);
-        container.innerHTML = `<p style="color: red;">❌ Erro: ${error.message}</p>`;
-      }
-    }
+            // 2. Controlar via instância retornada
+            async function openWidget() {
+                console.log(
+                    "🔓 Tentando abrir widget via instância...",
+                    widgetInstance,
+                );
+                if (widgetInstance) {
+                    try {
+                        await widgetInstance.open();
+                        console.log("✅ Widget aberto via instância!");
+                    } catch (error) {
+                        console.error("❌ Erro ao abrir:", error);
+                    }
+                } else {
+                    alert("Monte o widget primeiro!");
+                }
+            }
 
-    // 2. Controlar via instância retornada
-    async function openWidget() {
-      console.log('🔓 Tentando abrir widget via instância...', widgetInstance);
-      if (widgetInstance) {
-        try {
-          await widgetInstance.open();
-          console.log('✅ Widget aberto via instância!');
-        } catch (error) {
-          console.error('❌ Erro ao abrir:', error);
-        }
-      } else {
-        alert('Monte o widget primeiro!');
-      }
-    }
+            async function closeWidget() {
+                console.log(
+                    "🔒 Tentando fechar widget via instância...",
+                    widgetInstance,
+                );
+                if (widgetInstance) {
+                    try {
+                        await widgetInstance.close();
+                        console.log("✅ Widget fechado via instância!");
+                    } catch (error) {
+                        console.error("❌ Erro ao fechar:", error);
+                    }
+                } else {
+                    alert("Monte o widget primeiro!");
+                }
+            }
 
-    async function closeWidget() {
-      console.log('🔒 Tentando fechar widget via instância...', widgetInstance);
-      if (widgetInstance) {
-        try {
-          await widgetInstance.close();
-          console.log('✅ Widget fechado via instância!');
-        } catch (error) {
-          console.error('❌ Erro ao fechar:', error);
-        }
-      } else {
-        alert('Monte o widget primeiro!');
-      }
-    }
+            function destroyWidget() {
+                if (widgetInstance) {
+                    widgetInstance.destroy();
+                    widgetInstance = null;
+                    document.getElementById("widget-container").innerHTML =
+                        '<p>Widget foi destruído. <button onclick="mountWidget()">Montar novamente</button></p>';
+                }
+            }
 
-    function destroyWidget() {
-      if (widgetInstance) {
-        widgetInstance.destroy();
-        widgetInstance = null;
-        document.getElementById('widget-container').innerHTML =
-          '<p>Widget foi destruído. <button onclick="mountWidget()">Montar novamente</button></p>';
-      }
-    }
+            // 3. Controlar via API global direta
+            function openViaGlobalAPI() {
+                const globalAPI =
+                    window[`PaymentWidget_${widgetConfig.orderId}`];
+                if (globalAPI) {
+                    globalAPI.open();
+                } else {
+                    alert("Widget não está montado ou orderId não confere!");
+                }
+            }
 
-    // 3. Controlar via API global direta
-    function openViaGlobalAPI() {
-      const globalAPI = window[`PaymentWidget_${widgetConfig.merchantId}`];
-      if (globalAPI) {
-        globalAPI.open();
-      } else {
-        alert('Widget não está montado ou merchantId não confere!');
-      }
-    }
+            function closeViaGlobalAPI() {
+                const globalAPI =
+                    window[`PaymentWidget_${widgetConfig.orderId}`];
+                if (globalAPI) {
+                    globalAPI.close();
+                } else {
+                    alert("Widget não está montado!");
+                }
+            }
 
-    function closeViaGlobalAPI() {
-      const globalAPI = window[`PaymentWidget_${widgetConfig.merchantId}`];
-      if (globalAPI) {
-        globalAPI.close();
-      } else {
-        alert('Widget não está montado!');
-      }
-    }
+            function getStateViaGlobalAPI() {
+                const globalAPI =
+                    window[`PaymentWidget_${widgetConfig.orderId}`];
+                if (globalAPI) {
+                    const state = globalAPI.getState();
+                    alert("Estado atual: " + JSON.stringify(state, null, 2));
+                } else {
+                    alert("Widget não está montado!");
+                }
+            }
 
-    function getStateViaGlobalAPI() {
-      const globalAPI = window[`PaymentWidget_${widgetConfig.merchantId}`];
-      if (globalAPI) {
-        const state = globalAPI.getState();
-        alert('Estado atual: ' + JSON.stringify(state, null, 2));
-      } else {
-        alert('Widget não está montado!');
-      }
-    }
+            // Debug de inicialização
+            console.log("🚀 Script carregado!");
+            console.log(
+                "📦 CartaoSimplesWidget disponível:",
+                !!window.CartaoSimplesWidget,
+            );
+            console.log("⚛️  React disponível:", !!window.React);
+            console.log("🎭 ReactDOM disponível:", !!window.ReactDOM);
 
-    // Debug de inicialização
-    console.log('🚀 Script carregado!');
-    console.log('📦 CartaoSimplesWidget disponível:', !!window.CartaoSimplesWidget);
-    console.log('⚛️  React disponível:', !!window.React);
-    console.log('🎭 ReactDOM disponível:', !!window.ReactDOM);
-
-    // Auto-montar ao carregar a página (opcional)
-    window.addEventListener('DOMContentLoaded', () => {
-      console.log('✅ DOM carregado! Pronto para montar o widget.');
-      // Descomente a linha abaixo para auto-montar:
-      // mountWidget();
-    });
-  </script>
-</body>
-
+            // Auto-montar ao carregar a página (opcional)
+            window.addEventListener("DOMContentLoaded", () => {
+                console.log("✅ DOM carregado! Pronto para montar o widget.");
+                // Descomente a linha abaixo para auto-montar:
+                // mountWidget();
+            });
+        </script>
+    </body>
 </html>

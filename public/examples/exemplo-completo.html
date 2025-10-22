@@ -1,498 +1,589 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exemplo Completo - Widget Cartão Simples</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Exemplo Completo - Widget Cartão Simples</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 2rem;
-    }
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    "Helvetica Neue", Arial, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 2rem;
+            }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
 
-    .header {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
+            .header {
+                background: white;
+                padding: 2rem;
+                border-radius: 12px;
+                margin-bottom: 2rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
 
-    .header h1 {
-      color: #333;
-      margin-bottom: 0.5rem;
-    }
+            .header h1 {
+                color: #333;
+                margin-bottom: 0.5rem;
+            }
 
-    .header p {
-      color: #666;
-      font-size: 1.1rem;
-    }
+            .header p {
+                color: #666;
+                font-size: 1.1rem;
+            }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
+            .cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
 
-    .card {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
+            .card {
+                background: white;
+                padding: 2rem;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
 
-    .card h2 {
-      color: #333;
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
-    }
+            .card h2 {
+                color: #333;
+                margin-bottom: 1rem;
+                font-size: 1.5rem;
+            }
 
-    .card p {
-      color: #666;
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
+            .card p {
+                color: #666;
+                margin-bottom: 1.5rem;
+                line-height: 1.6;
+            }
 
-    .btn {
-      width: 100%;
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
+            .btn {
+                width: 100%;
+                padding: 1rem 2rem;
+                border: none;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
+            .btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
-    }
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+            }
 
-    .btn-secondary {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-    }
+            .btn-secondary {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+            }
 
-    .btn-secondary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(240, 147, 251, 0.4);
-    }
+            .btn-secondary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(240, 147, 251, 0.4);
+            }
 
-    .btn-success {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      color: white;
-    }
+            .btn-success {
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                color: white;
+            }
 
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(79, 172, 254, 0.4);
-    }
+            .btn-success:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(79, 172, 254, 0.4);
+            }
 
-    .logs {
-      background: #1e1e1e;
-      color: #d4d4d4;
-      padding: 1.5rem;
-      border-radius: 8px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9rem;
-      max-height: 400px;
-      overflow-y: auto;
-      margin-top: 2rem;
-    }
+            .logs {
+                background: #1e1e1e;
+                color: #d4d4d4;
+                padding: 1.5rem;
+                border-radius: 8px;
+                font-family: "Courier New", monospace;
+                font-size: 0.9rem;
+                max-height: 400px;
+                overflow-y: auto;
+                margin-top: 2rem;
+            }
 
-    .logs h3 {
-      color: #4ec9b0;
-      margin-bottom: 1rem;
-    }
+            .logs h3 {
+                color: #4ec9b0;
+                margin-bottom: 1rem;
+            }
 
-    .log-entry {
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #333;
-    }
+            .log-entry {
+                padding: 0.5rem 0;
+                border-bottom: 1px solid #333;
+            }
 
-    .log-entry:last-child {
-      border-bottom: none;
-    }
+            .log-entry:last-child {
+                border-bottom: none;
+            }
 
-    .log-time {
-      color: #858585;
-      margin-right: 0.5rem;
-    }
+            .log-time {
+                color: #858585;
+                margin-right: 0.5rem;
+            }
 
-    .log-success {
-      color: #4ec9b0;
-    }
+            .log-success {
+                color: #4ec9b0;
+            }
 
-    .log-error {
-      color: #f48771;
-    }
+            .log-error {
+                color: #f48771;
+            }
 
-    .log-info {
-      color: #4fc1ff;
-    }
+            .log-info {
+                color: #4fc1ff;
+            }
 
-    .config-panel {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      margin-bottom: 2rem;
-    }
+            .config-panel {
+                background: white;
+                padding: 2rem;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 2rem;
+            }
 
-    .config-panel h2 {
-      margin-bottom: 1.5rem;
-      color: #333;
-    }
+            .config-panel h2 {
+                margin-bottom: 1.5rem;
+                color: #333;
+            }
 
-    .form-group {
-      margin-bottom: 1rem;
-    }
+            .form-group {
+                margin-bottom: 1rem;
+            }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #666;
-      font-weight: 600;
-    }
+            .form-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #666;
+                font-weight: 600;
+            }
 
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 6px;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 0.75rem;
+                border: 2px solid #e0e0e0;
+                border-radius: 6px;
+                font-size: 1rem;
+                transition: border-color 0.3s;
+            }
 
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: #667eea;
-    }
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #667eea;
+            }
 
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
+            .badge {
+                display: inline-block;
+                padding: 0.25rem 0.75rem;
+                border-radius: 12px;
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
 
-    .badge-success {
-      background: #d4edda;
-      color: #155724;
-    }
+            .badge-success {
+                background: #d4edda;
+                color: #155724;
+            }
 
-    .badge-warning {
-      background: #fff3cd;
-      color: #856404;
-    }
+            .badge-warning {
+                background: #fff3cd;
+                color: #856404;
+            }
 
-    @media (max-width: 768px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <h1>🚀 Widget Cartão Simples - Demonstração Completa</h1>
-      <p>
-        Teste todas as funcionalidades do widget de pagamento white-label.
-        <span class="badge badge-success">✓ CDN Ativo</span>
-        <span class="badge badge-warning" id="widget-status">Carregando...</span>
-      </p>
-    </div>
+            @media (max-width: 768px) {
+                .cards {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <h1>🚀 Widget Cartão Simples - Demonstração Completa</h1>
+                <p>
+                    Teste todas as funcionalidades do widget de pagamento
+                    white-label.
+                    <span class="badge badge-success">✓ CDN Ativo</span>
+                    <span class="badge badge-warning" id="widget-status"
+                        >Carregando...</span
+                    >
+                </p>
+            </div>
 
-    <!-- Configuration Panel -->
-    <div class="config-panel">
-      <h2>⚙️ Configuração do Widget</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-        <div class="form-group">
-          <label for="merchantId">Merchant ID</label>
-          <input type="text" id="merchantId" value="test-merchant-123">
+            <!-- Configuration Panel -->
+            <div class="config-panel">
+                <h2>⚙️ Configuração do Widget</h2>
+                <div
+                    style="
+                        display: grid;
+                        grid-template-columns: repeat(
+                            auto-fit,
+                            minmax(250px, 1fr)
+                        );
+                        gap: 1rem;
+                    "
+                >
+                    <div class="form-group">
+                        <label for="orderId">Merchant ID</label>
+                        <input
+                            type="text"
+                            id="orderId"
+                            value="test-merchant-123"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="primaryColor">Cor Primária</label>
+                        <input type="color" id="primaryColor" value="#667eea" />
+                    </div>
+                    <div class="form-group">
+                        <label for="secondaryColor">Cor Secundária</label>
+                        <input
+                            type="color"
+                            id="secondaryColor"
+                            value="#764ba2"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="environment">Ambiente</label>
+                        <select id="environment">
+                            <option value="staging">Staging</option>
+                            <option value="production">Production</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Cards -->
+            <div class="cards">
+                <div class="card">
+                    <h2>💳 Pagamento Básico</h2>
+                    <p>
+                        Abre o widget com configuração padrão e tema
+                        personalizado.
+                    </p>
+                    <button
+                        class="btn btn-primary"
+                        onclick="abrirWidgetBasico()"
+                    >
+                        <span>💳</span>
+                        Abrir Widget Básico
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h2>🎨 Widget Customizado</h2>
+                    <p>
+                        Usa as configurações do painel acima para personalizar o
+                        widget.
+                    </p>
+                    <button
+                        class="btn btn-secondary"
+                        onclick="abrirWidgetCustomizado()"
+                    >
+                        <span>🎨</span>
+                        Abrir Widget Customizado
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h2>🔧 Controle Programático</h2>
+                    <p>
+                        Demonstra controle via JavaScript: abrir, fechar e
+                        destruir.
+                    </p>
+                    <button
+                        class="btn btn-success"
+                        onclick="demonstrarControle()"
+                    >
+                        <span>🔧</span>
+                        Testar Controle
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logs -->
+            <div class="logs">
+                <h3>📋 Console de Eventos</h3>
+                <div id="log-container">
+                    <div class="log-entry">
+                        <span class="log-time">[carregando]</span>
+                        <span class="log-info"
+                            >Aguardando carregamento do widget...</span
+                        >
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-          <label for="primaryColor">Cor Primária</label>
-          <input type="color" id="primaryColor" value="#667eea">
-        </div>
-        <div class="form-group">
-          <label for="secondaryColor">Cor Secundária</label>
-          <input type="color" id="secondaryColor" value="#764ba2">
-        </div>
-        <div class="form-group">
-          <label for="environment">Ambiente</label>
-          <select id="environment">
-            <option value="staging">Staging</option>
-            <option value="production">Production</option>
-          </select>
-        </div>
-      </div>
-    </div>
 
-    <!-- Action Cards -->
-    <div class="cards">
-      <div class="card">
-        <h2>💳 Pagamento Básico</h2>
-        <p>Abre o widget com configuração padrão e tema personalizado.</p>
-        <button class="btn btn-primary" onclick="abrirWidgetBasico()">
-          <span>💳</span>
-          Abrir Widget Básico
-        </button>
-      </div>
+        <!-- Widget Bootstrap -->
+        <script
+            src="https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js"
+            async
+        ></script>
 
-      <div class="card">
-        <h2>🎨 Widget Customizado</h2>
-        <p>Usa as configurações do painel acima para personalizar o widget.</p>
-        <button class="btn btn-secondary" onclick="abrirWidgetCustomizado()">
-          <span>🎨</span>
-          Abrir Widget Customizado
-        </button>
-      </div>
+        <script>
+            // Sistema de logs
+            const logContainer = document.getElementById("log-container");
 
-      <div class="card">
-        <h2>🔧 Controle Programático</h2>
-        <p>Demonstra controle via JavaScript: abrir, fechar e destruir.</p>
-        <button class="btn btn-success" onclick="demonstrarControle()">
-          <span>🔧</span>
-          Testar Controle
-        </button>
-      </div>
-    </div>
+            function addLog(message, type = "info") {
+                const entry = document.createElement("div");
+                entry.className = "log-entry";
 
-    <!-- Logs -->
-    <div class="logs">
-      <h3>📋 Console de Eventos</h3>
-      <div id="log-container">
-        <div class="log-entry">
-          <span class="log-time">[carregando]</span>
-          <span class="log-info">Aguardando carregamento do widget...</span>
-        </div>
-      </div>
-    </div>
-  </div>
+                const time = new Date().toLocaleTimeString("pt-BR");
+                const typeClass = `log-${type}`;
 
-  <!-- Widget Bootstrap -->
-  <script src="https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js" async></script>
-
-  <script>
-    // Sistema de logs
-    const logContainer = document.getElementById('log-container');
-    
-    function addLog(message, type = 'info') {
-      const entry = document.createElement('div');
-      entry.className = 'log-entry';
-      
-      const time = new Date().toLocaleTimeString('pt-BR');
-      const typeClass = `log-${type}`;
-      
-      entry.innerHTML = `
+                entry.innerHTML = `
         <span class="log-time">[${time}]</span>
         <span class="${typeClass}">${message}</span>
       `;
-      
-      logContainer.appendChild(entry);
-      logContainer.scrollTop = logContainer.scrollHeight;
-      
-      // Manter apenas últimos 20 logs
-      while (logContainer.children.length > 20) {
-        logContainer.removeChild(logContainer.firstChild);
-      }
-    }
 
-    // Verificar quando o widget carregar
-    const checkWidgetInterval = setInterval(() => {
-      if (typeof window.PaymentWidget !== 'undefined') {
-        clearInterval(checkWidgetInterval);
-        document.getElementById('widget-status').textContent = '✓ Widget Pronto';
-        document.getElementById('widget-status').className = 'badge badge-success';
-        addLog('✅ Widget carregado e pronto para uso!', 'success');
-      }
-    }, 100);
+                logContainer.appendChild(entry);
+                logContainer.scrollTop = logContainer.scrollHeight;
 
-    // Timeout de 10 segundos
-    setTimeout(() => {
-      if (typeof window.PaymentWidget === 'undefined') {
-        clearInterval(checkWidgetInterval);
-        document.getElementById('widget-status').textContent = '✗ Erro ao Carregar';
-        document.getElementById('widget-status').className = 'badge badge-error';
-        addLog('❌ Timeout: Widget não carregou em 10 segundos', 'error');
-      }
-    }, 10000);
+                // Manter apenas últimos 20 logs
+                while (logContainer.children.length > 20) {
+                    logContainer.removeChild(logContainer.firstChild);
+                }
+            }
 
-    // Função: Widget Básico
-    function abrirWidgetBasico() {
-      addLog('🔄 Abrindo widget básico...', 'info');
-      
-      if (typeof window.PaymentWidget === 'undefined') {
-        addLog('❌ Widget ainda não carregado. Aguarde...', 'error');
-        alert('Widget ainda está carregando. Tente novamente em alguns segundos.');
-        return;
-      }
+            // Verificar quando o widget carregar
+            const checkWidgetInterval = setInterval(() => {
+                if (typeof window.PaymentWidget !== "undefined") {
+                    clearInterval(checkWidgetInterval);
+                    document.getElementById("widget-status").textContent =
+                        "✓ Widget Pronto";
+                    document.getElementById("widget-status").className =
+                        "badge badge-success";
+                    addLog("✅ Widget carregado e pronto para uso!", "success");
+                }
+            }, 100);
 
-      try {
-        window.PaymentWidget.init({
-          merchantId: 'test-merchant-basic',
-          primaryColor: '#667eea',
-          secondaryColor: '#764ba2',
-          environment: 'staging',
-          autoOpen: true,
-          
-          onSuccess: (data) => {
-            addLog(`✅ Pagamento aprovado! ID: ${data.transactionId}`, 'success');
-            console.log('Dados completos:', data);
-          },
-          
-          onError: (error) => {
-            addLog(`❌ Erro no pagamento: ${error.message}`, 'error');
-            console.error('Erro completo:', error);
-          },
-          
-          onOpen: () => {
-            addLog('📂 Widget aberto', 'info');
-          },
-          
-          onClose: () => {
-            addLog('📁 Widget fechado', 'info');
-          }
-        });
-        
-        addLog('✅ Widget básico inicializado', 'success');
-      } catch (error) {
-        addLog(`❌ Erro ao inicializar: ${error.message}`, 'error');
-      }
-    }
+            // Timeout de 10 segundos
+            setTimeout(() => {
+                if (typeof window.PaymentWidget === "undefined") {
+                    clearInterval(checkWidgetInterval);
+                    document.getElementById("widget-status").textContent =
+                        "✗ Erro ao Carregar";
+                    document.getElementById("widget-status").className =
+                        "badge badge-error";
+                    addLog(
+                        "❌ Timeout: Widget não carregou em 10 segundos",
+                        "error",
+                    );
+                }
+            }, 10000);
 
-    // Função: Widget Customizado
-    function abrirWidgetCustomizado() {
-      addLog('🎨 Abrindo widget customizado...', 'info');
-      
-      if (typeof window.PaymentWidget === 'undefined') {
-        addLog('❌ Widget ainda não carregado', 'error');
-        alert('Widget ainda está carregando. Tente novamente em alguns segundos.');
-        return;
-      }
+            // Função: Widget Básico
+            function abrirWidgetBasico() {
+                addLog("🔄 Abrindo widget básico...", "info");
 
-      const config = {
-        merchantId: document.getElementById('merchantId').value,
-        primaryColor: document.getElementById('primaryColor').value,
-        secondaryColor: document.getElementById('secondaryColor').value,
-        environment: document.getElementById('environment').value,
-        autoOpen: true,
-        
-        onSuccess: (data) => {
-          addLog(`✅ Pagamento aprovado! ID: ${data.transactionId}`, 'success');
-          addLog(`💰 Valor: R$ ${data.amount || 'N/A'}`, 'info');
-          addLog(`📊 Parcelas: ${data.installments || 'N/A'}x`, 'info');
-        },
-        
-        onError: (error) => {
-          addLog(`❌ Erro: ${error.message}`, 'error');
-        },
-        
-        onOpen: () => {
-          addLog('📂 Widget customizado aberto', 'info');
-        },
-        
-        onClose: () => {
-          addLog('📁 Widget customizado fechado', 'info');
-        }
-      };
+                if (typeof window.PaymentWidget === "undefined") {
+                    addLog(
+                        "❌ Widget ainda não carregado. Aguarde...",
+                        "error",
+                    );
+                    alert(
+                        "Widget ainda está carregando. Tente novamente em alguns segundos.",
+                    );
+                    return;
+                }
 
-      try {
-        window.PaymentWidget.init(config);
-        addLog(`✅ Widget configurado com merchant: ${config.merchantId}`, 'success');
-        addLog(`🎨 Cores: ${config.primaryColor} / ${config.secondaryColor}`, 'info');
-      } catch (error) {
-        addLog(`❌ Erro ao configurar: ${error.message}`, 'error');
-      }
-    }
+                try {
+                    window.PaymentWidget.init({
+                        orderId: "test-merchant-basic",
+                        primaryColor: "#667eea",
+                        secondaryColor: "#764ba2",
+                        environment: "staging",
+                        autoOpen: true,
 
-    // Função: Controle Programático
-    async function demonstrarControle() {
-      addLog('🔧 Iniciando demonstração de controle...', 'info');
-      
-      if (typeof window.PaymentWidget === 'undefined') {
-        addLog('❌ Widget não disponível', 'error');
-        return;
-      }
+                        onSuccess: (data) => {
+                            addLog(
+                                `✅ Pagamento aprovado! ID: ${data.transactionId}`,
+                                "success",
+                            );
+                            console.log("Dados completos:", data);
+                        },
 
-      try {
-        // 1. Inicializar sem auto-open
-        addLog('1️⃣ Inicializando widget (sem auto-open)...', 'info');
-        window.PaymentWidget.init({
-          merchantId: 'test-control',
-          primaryColor: '#4facfe',
-          autoOpen: false,
-          onSuccess: (data) => addLog(`✅ Transação: ${data.transactionId}`, 'success'),
-          onError: (error) => addLog(`❌ ${error.message}`, 'error')
-        });
-        
-        await sleep(1000);
-        
-        // 2. Abrir manualmente
-        addLog('2️⃣ Abrindo widget manualmente...', 'info');
-        window.PaymentWidget.open();
-        
-        await sleep(2000);
-        
-        // 3. Fechar manualmente
-        addLog('3️⃣ Fechando widget...', 'info');
-        window.PaymentWidget.close();
-        
-        await sleep(1000);
-        
-        // 4. Abrir novamente
-        addLog('4️⃣ Reabrindo widget...', 'info');
-        window.PaymentWidget.open();
-        
-        addLog('✅ Demonstração completa! Feche o widget para continuar.', 'success');
-        
-      } catch (error) {
-        addLog(`❌ Erro na demonstração: ${error.message}`, 'error');
-      }
-    }
+                        onError: (error) => {
+                            addLog(
+                                `❌ Erro no pagamento: ${error.message}`,
+                                "error",
+                            );
+                            console.error("Erro completo:", error);
+                        },
 
-    // Helper: Sleep
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+                        onOpen: () => {
+                            addLog("📂 Widget aberto", "info");
+                        },
 
-    // Listeners globais
-    window.addEventListener('error', (e) => {
-      addLog(`⚠️ Erro global: ${e.message}`, 'error');
-    });
+                        onClose: () => {
+                            addLog("📁 Widget fechado", "info");
+                        },
+                    });
 
-    // Log inicial
-    addLog('🚀 Página carregada. Aguardando widget...', 'info');
-  </script>
-</body>
+                    addLog("✅ Widget básico inicializado", "success");
+                } catch (error) {
+                    addLog(`❌ Erro ao inicializar: ${error.message}`, "error");
+                }
+            }
+
+            // Função: Widget Customizado
+            function abrirWidgetCustomizado() {
+                addLog("🎨 Abrindo widget customizado...", "info");
+
+                if (typeof window.PaymentWidget === "undefined") {
+                    addLog("❌ Widget ainda não carregado", "error");
+                    alert(
+                        "Widget ainda está carregando. Tente novamente em alguns segundos.",
+                    );
+                    return;
+                }
+
+                const config = {
+                    orderId: document.getElementById("orderId").value,
+                    primaryColor: document.getElementById("primaryColor").value,
+                    secondaryColor:
+                        document.getElementById("secondaryColor").value,
+                    environment: document.getElementById("environment").value,
+                    autoOpen: true,
+
+                    onSuccess: (data) => {
+                        addLog(
+                            `✅ Pagamento aprovado! ID: ${data.transactionId}`,
+                            "success",
+                        );
+                        addLog(`💰 Valor: R$ ${data.amount || "N/A"}`, "info");
+                        addLog(
+                            `📊 Parcelas: ${data.installments || "N/A"}x`,
+                            "info",
+                        );
+                    },
+
+                    onError: (error) => {
+                        addLog(`❌ Erro: ${error.message}`, "error");
+                    },
+
+                    onOpen: () => {
+                        addLog("📂 Widget customizado aberto", "info");
+                    },
+
+                    onClose: () => {
+                        addLog("📁 Widget customizado fechado", "info");
+                    },
+                };
+
+                try {
+                    window.PaymentWidget.init(config);
+                    addLog(
+                        `✅ Widget configurado com merchant: ${config.orderId}`,
+                        "success",
+                    );
+                    addLog(
+                        `🎨 Cores: ${config.primaryColor} / ${config.secondaryColor}`,
+                        "info",
+                    );
+                } catch (error) {
+                    addLog(`❌ Erro ao configurar: ${error.message}`, "error");
+                }
+            }
+
+            // Função: Controle Programático
+            async function demonstrarControle() {
+                addLog("🔧 Iniciando demonstração de controle...", "info");
+
+                if (typeof window.PaymentWidget === "undefined") {
+                    addLog("❌ Widget não disponível", "error");
+                    return;
+                }
+
+                try {
+                    // 1. Inicializar sem auto-open
+                    addLog(
+                        "1️⃣ Inicializando widget (sem auto-open)...",
+                        "info",
+                    );
+                    window.PaymentWidget.init({
+                        orderId: "test-control",
+                        primaryColor: "#4facfe",
+                        autoOpen: false,
+                        onSuccess: (data) =>
+                            addLog(
+                                `✅ Transação: ${data.transactionId}`,
+                                "success",
+                            ),
+                        onError: (error) =>
+                            addLog(`❌ ${error.message}`, "error"),
+                    });
+
+                    await sleep(1000);
+
+                    // 2. Abrir manualmente
+                    addLog("2️⃣ Abrindo widget manualmente...", "info");
+                    window.PaymentWidget.open();
+
+                    await sleep(2000);
+
+                    // 3. Fechar manualmente
+                    addLog("3️⃣ Fechando widget...", "info");
+                    window.PaymentWidget.close();
+
+                    await sleep(1000);
+
+                    // 4. Abrir novamente
+                    addLog("4️⃣ Reabrindo widget...", "info");
+                    window.PaymentWidget.open();
+
+                    addLog(
+                        "✅ Demonstração completa! Feche o widget para continuar.",
+                        "success",
+                    );
+                } catch (error) {
+                    addLog(
+                        `❌ Erro na demonstração: ${error.message}`,
+                        "error",
+                    );
+                }
+            }
+
+            // Helper: Sleep
+            function sleep(ms) {
+                return new Promise((resolve) => setTimeout(resolve, ms));
+            }
+
+            // Listeners globais
+            window.addEventListener("error", (e) => {
+                addLog(`⚠️ Erro global: ${e.message}`, "error");
+            });
+
+            // Log inicial
+            addLog("🚀 Página carregada. Aguardando widget...", "info");
+        </script>
+    </body>
 </html>

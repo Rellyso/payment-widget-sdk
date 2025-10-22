@@ -177,7 +177,7 @@ secondaryColor: '#0A0A0A'   // Preto
 
 ### Alterar merchant ID
 ```javascript
-merchantId: 'seu-merchant-123'
+orderId: 'seu-merchant-123'
 ```
 
 ### Adicionar logo
@@ -234,7 +234,7 @@ cp minimal.html meu-exemplo.html
 **2. Edite as configurações:**
 ```javascript
 window.PaymentWidget.init({
-  merchantId: 'seu-id',
+  orderId: 'seu-id',
   primaryColor: '#sua-cor',
   // ... suas configurações
 });

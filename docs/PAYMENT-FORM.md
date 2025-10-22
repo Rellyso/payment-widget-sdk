@@ -226,7 +226,7 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
 ```json
 {
   "token": "tok_xxxxxxxxxxx",
-  "merchantId": "mch_123",
+  "orderId": "mch_123",
   "amount": 10000,
   "installments": 1
 }
@@ -253,7 +253,7 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
   onNext={(step) => console.log("Próximo:", step)}
   onPrev={() => console.log("Voltar")}
   config={{
-    merchantId: "mch_123",
+    orderId: "mch_123",
     apiBaseUrl: "/api",
     onSuccess: (result) => {
       console.log("Pagamento aprovado:", result.transactionId);
@@ -270,7 +270,7 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
 ```tsx
 <PaymentFormStep
   config={{
-    merchantId: "mch_123",
+    orderId: "mch_123",
     apiBaseUrl: "https://api.meubackend.com",
     onSuccess: async (result) => {
       await savePurchase(result);
@@ -292,11 +292,11 @@ export function PaymentFormStep({ onNext, onPrev, config }: StepProps) {
 const merchants = ["mch_001", "mch_002", "mch_003"];
 
 {
-  merchants.map((merchantId) => (
+  merchants.map((orderId) => (
     <PaymentFormStep
-      key={merchantId}
+      key={orderId}
       config={{
-        merchantId,
+        orderId,
         apiBaseUrl: "/api",
         // callbacks...
       }}
@@ -384,7 +384,7 @@ Chamado quando o pagamento é aprovado com sucesso:
 config.onSuccess({
   transactionId: "txn_abc123",
   token: "tok_xxxxx",
-  merchantId: "mch_123",
+  orderId: "mch_123",
   installments: 3,
   timestamp: "2024-01-15T10:30:00.000Z",
 });
@@ -538,6 +538,6 @@ try {
 
 ---
 
-**Última atualização**: Janeiro 2024  
-**Versão**: 2.0.0  
+**Última atualização**: Janeiro 2024
+**Versão**: 2.0.0
 **Autor**: Cartão Simples Team

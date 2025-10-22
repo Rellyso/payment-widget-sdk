@@ -23,7 +23,7 @@
 <script src="https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js"></script>
 <script>
   window.PaymentWidget.init({
-    merchantId: "seu-id",
+    orderId: "seu-id",
     primaryColor: "#667eea",
     onSuccess: (data) => console.log("Aprovado!", data),
   });
@@ -161,7 +161,7 @@
 
 ```javascript
 window.PaymentWidget.init({
-  merchantId: "seu-id",
+  orderId: "seu-id",
   primaryColor: "#sua-cor",
 });
 ```
@@ -348,12 +348,12 @@ npm install --save-dev @playwright/test
 
 **🚀 Tudo pronto para produção!**
 
-**📧 Dúvidas?** dev@cartaosimples.com  
-**🐛 Issues?** https://github.com/Rellyso/payment-widget-poc/issues  
+**📧 Dúvidas?** dev@cartaosimples.com
+**🐛 Issues?** https://github.com/Rellyso/payment-widget-poc/issues
 **📚 Docs?** Veja [DOCS-INDEX.md](./DOCS-INDEX.md)
 
 ---
 
-_Última atualização: Outubro 2025_  
-_Versão: 1.0.0_  
+_Última atualização: Outubro 2025_
+_Versão: 1.0.0_
 _Status: ✅ PRONTO PARA USO_

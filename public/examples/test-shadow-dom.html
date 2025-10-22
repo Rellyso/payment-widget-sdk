@@ -1,505 +1,626 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Shadow DOM - Payment Widget</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #f5f5f5;
-    }
-
-    .container {
-      background: white;
-      border-radius: 8px;
-      padding: 30px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      color: #666;
-      margin-bottom: 30px;
-    }
-
-    .test-section {
-      margin-bottom: 30px;
-      padding: 20px;
-      background: #f9f9f9;
-      border-radius: 6px;
-      border-left: 4px solid #4CAF50;
-    }
-
-    .test-section h2 {
-      margin-top: 0;
-      color: #333;
-      font-size: 18px;
-    }
-
-    .status {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 4px;
-      font-weight: 600;
-      font-size: 14px;
-      margin-left: 10px;
-    }
-
-    .status.success {
-      background: #4CAF50;
-      color: white;
-    }
-
-    .status.error {
-      background: #f44336;
-      color: white;
-    }
-
-    .status.warning {
-      background: #ff9800;
-      color: white;
-    }
-
-    .info-box {
-      background: #e3f2fd;
-      border: 1px solid #2196F3;
-      border-radius: 4px;
-      padding: 15px;
-      margin: 15px 0;
-    }
-
-    .info-box strong {
-      color: #1976D2;
-    }
-
-    .code-block {
-      background: #263238;
-      color: #aed581;
-      padding: 15px;
-      border-radius: 4px;
-      overflow-x: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      margin: 10px 0;
-    }
-
-    button {
-      background: #2196F3;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-right: 10px;
-      margin-bottom: 10px;
-    }
-
-    button:hover {
-      background: #1976D2;
-    }
-
-    button.secondary {
-      background: #757575;
-    }
-
-    button.secondary:hover {
-      background: #616161;
-    }
-
-    #console-output {
-      background: #263238;
-      color: #aed581;
-      padding: 15px;
-      border-radius: 4px;
-      max-height: 400px;
-      overflow-y: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .log-entry {
-      margin: 5px 0;
-    }
-
-    .log-entry.info {
-      color: #64B5F6;
-    }
-
-    .log-entry.success {
-      color: #81C784;
-    }
-
-    .log-entry.error {
-      color: #E57373;
-    }
-
-    .log-entry.warning {
-      color: #FFB74D;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-    <h1>🔍 Shadow DOM Test - Payment Widget</h1>
-    <p class="subtitle">Teste e verifique se o Shadow DOM está funcionando corretamente</p>
-
-    <!-- Test Section 1: Shadow DOM Detection -->
-    <div class="test-section">
-      <h2>1️⃣ Detecção de Shadow DOM <span id="status-1" class="status">Aguardando...</span></h2>
-      <p>Verifica se o navegador suporta Shadow DOM e se ele foi criado corretamente.</p>
-      <div id="result-1" class="info-box" style="display: none;"></div>
-    </div>
-
-    <!-- Test Section 2: Style Isolation -->
-    <div class="test-section">
-      <h2>2️⃣ Isolamento de Estilos <span id="status-2" class="status">Aguardando...</span></h2>
-      <p>Testa se os estilos CSS estão isolados entre a página e o Shadow DOM.</p>
-      <div id="result-2" class="info-box" style="display: none;"></div>
-    </div>
-
-    <!-- Test Section 3: DOM Inspection -->
-    <div class="test-section">
-      <h2>3️⃣ Inspeção do DOM <span id="status-3" class="status">Aguardando...</span></h2>
-      <p>Mostra a estrutura do DOM e do Shadow DOM.</p>
-      <div id="result-3" class="info-box" style="display: none;"></div>
-    </div>
-
-    <!-- Control Buttons -->
-    <div style="margin: 30px 0;">
-      <button onclick="initWidget()">🚀 Inicializar Widget</button>
-      <button onclick="openWidget()" class="secondary">📖 Abrir Widget</button>
-      <button onclick="closeWidget()" class="secondary">🚪 Fechar Widget</button>
-      <button onclick="runAllTests()" class="secondary">🧪 Executar Testes</button>
-      <button onclick="inspectWidget()" class="secondary">🔍 Inspecionar Widget</button>
-      <button onclick="clearConsole()" class="secondary">🗑️ Limpar Console</button>
-    </div>
-
-    <!-- Console Output -->
-    <div class="test-section">
-      <h2>📋 Console de Logs</h2>
-      <div id="console-output"></div>
-    </div>
-
-    <!-- Instructions -->
-    <div class="info-box" style="margin-top: 30px;">
-      <h3 style="margin-top: 0;">💡 Como verificar no DevTools:</h3>
-      <ol>
-        <li>Abra o DevTools (F12 ou Cmd+Option+I no Mac)</li>
-        <li>Vá para a aba "Elements" ou "Inspetor"</li>
-        <li>Procure por um elemento com <code>#shadow-root (open)</code></li>
-        <li>Expanda o shadow-root para ver o conteúdo isolado</li>
-        <li>Tente selecionar elementos dentro do Shadow DOM - eles estarão isolados</li>
-      </ol>
-    </div>
-  </div>
-
-  <!-- Widget Bootstrap Script -->
-  <script>
-    // Console Logger
-    function log(message, type = 'info') {
-      const consoleOutput = document.getElementById('console-output');
-      const timestamp = new Date().toLocaleTimeString();
-      const entry = document.createElement('div');
-      entry.className = `log-entry ${type}`;
-      entry.textContent = `[${timestamp}] ${message}`;
-      consoleOutput.appendChild(entry);
-      consoleOutput.scrollTop = consoleOutput.scrollHeight;
-    }
-
-    function clearConsole() {
-      document.getElementById('console-output').innerHTML = '';
-      log('Console limpo', 'info');
-    }
-
-    // Initialize Widget
-    async function initWidget() {
-      log('🚀 Iniciando widget...', 'info');
-
-      try {
-        // Load bootstrap script
-        if (!window.PaymentWidget) {
-          log('Carregando script do bootstrap...', 'info');
-          const script = document.createElement('script');
-          script.src = 'https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js';
-          script.async = true;
-
-          script.onload = async () => {
-            log('✅ Bootstrap carregado com sucesso', 'success');
-            await actualInit();
-          };
-
-          script.onerror = () => {
-            log('❌ Erro ao carregar bootstrap', 'error');
-          };
-
-          document.head.appendChild(script);
-        } else {
-          await actualInit();
-        }
-      } catch (error) {
-        log(`❌ Erro na inicialização: ${error.message}`, 'error');
-      }
-    }
-
-    async function actualInit() {
-      try {
-        await window.PaymentWidget.init({
-          merchantId: 'test_shadow_dom_123',
-          environment: 'staging',
-          theme: {
-            primaryColor: '#2196F3',
-            secondaryColor: '#4CAF50'
-          },
-          onOpen: () => {
-            log('🔔 Callback onOpen chamado', 'success');
-          },
-          onClose: () => {
-            log('🔔 Callback onClose chamado', 'info');
-          },
-          onError: (error) => {
-            log(`🔔 Callback onError: ${error.message}`, 'error');
-          }
-        });
-
-        log('✅ Widget inicializado com sucesso', 'success');
-
-        // Log container state
-        const container = document.querySelector('[id^="__payment_widget_root__"]');
-        if (container) {
-          const styles = window.getComputedStyle(container);
-          log(`📦 Container display: ${styles.display}`, 'info');
-          log(`📦 Container pointer-events: ${styles.pointerEvents}`, 'info');
-          log(`📦 Container z-index: ${styles.zIndex}`, 'info');
-        }
-
-        // Run tests automatically after init
-        setTimeout(() => {
-          runAllTests();
-        }, 1000);
-
-      } catch (error) {
-        log(`❌ Erro ao inicializar: ${error.message}`, 'error');
-      }
-    }
-
-    function openWidget() {
-      if (window.PaymentWidget) {
-        log('📖 Chamando PaymentWidget.open()...', 'info');
-        window.PaymentWidget.open();
-
-        // Check state after opening
-        setTimeout(() => {
-          const state = window.PaymentWidget.getState();
-          log(`🔍 Estado após open: isOpen=${state.isOpen}, isLoaded=${state.isLoaded}`, 'info');
-
-          const container = document.querySelector('[id^="__payment_widget_root__"]');
-          if (container) {
-            const styles = window.getComputedStyle(container);
-            log(`� Container após open - display: ${styles.display}`, 'info');
-            log(`📦 Container após open - visibility: ${styles.visibility}`, 'info');
-
-            if (container.shadowRoot) {
-              const rootElement = container.shadowRoot.getElementById('pw-root');
-              if (rootElement) {
-                log(`✅ Root element encontrado no Shadow DOM`, 'success');
-                log(`📦 Root element children: ${rootElement.children.length}`, 'info');
-
-                // Check if React rendered anything
-                const reactRoot = rootElement.querySelector('[class*="payment"]');
-                if (reactRoot) {
-                  log(`✅ Componente React renderizado`, 'success');
-                } else {
-                  log(`⚠️ Componente React não encontrado`, 'warning');
-                }
-              } else {
-                log(`❌ Root element não encontrado`, 'error');
-              }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test Shadow DOM - Payment Widget</title>
+        <style>
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                max-width: 1200px;
+                margin: 40px auto;
+                padding: 20px;
+                background: #f5f5f5;
             }
-          }
-        }, 500);
-      } else {
-        log('⚠️ Widget não inicializado. Clique em "Inicializar Widget" primeiro.', 'warning');
-      }
-    }
 
-    function closeWidget() {
-      if (window.PaymentWidget) {
-        log('🚪 Chamando PaymentWidget.close()...', 'info');
-        window.PaymentWidget.close();
+            .container {
+                background: white;
+                border-radius: 8px;
+                padding: 30px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
 
-        setTimeout(() => {
-          const state = window.PaymentWidget.getState();
-          log(`🔍 Estado após close: isOpen=${state.isOpen}`, 'info');
-        }, 300);
-      } else {
-        log('⚠️ Widget não inicializado.', 'warning');
-      }
-    }
+            h1 {
+                color: #333;
+                margin-bottom: 10px;
+            }
 
-    function inspectWidget() {
-      log('🔍 Inspecionando widget...', 'info');
+            .subtitle {
+                color: #666;
+                margin-bottom: 30px;
+            }
 
-      if (!window.PaymentWidget) {
-        log('❌ PaymentWidget não disponível', 'error');
-        return;
-      }
+            .test-section {
+                margin-bottom: 30px;
+                padding: 20px;
+                background: #f9f9f9;
+                border-radius: 6px;
+                border-left: 4px solid #4caf50;
+            }
 
-      const state = window.PaymentWidget.getState();
-      log(`📊 Estado: isOpen=${state.isOpen}, isLoaded=${state.isLoaded}`, 'info');
+            .test-section h2 {
+                margin-top: 0;
+                color: #333;
+                font-size: 18px;
+            }
 
-      const container = document.querySelector('[id^="__payment_widget_root__"]');
-      if (!container) {
-        log('❌ Container não encontrado', 'error');
-        return;
-      }
+            .status {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 4px;
+                font-weight: 600;
+                font-size: 14px;
+                margin-left: 10px;
+            }
 
-      log(`✅ Container: ${container.id}`, 'success');
+            .status.success {
+                background: #4caf50;
+                color: white;
+            }
 
-      const styles = window.getComputedStyle(container);
-      log(`📦 Container styles:`, 'info');
-      log(`   display: ${styles.display}`, 'info');
-      log(`   visibility: ${styles.visibility}`, 'info');
-      log(`   pointer-events: ${styles.pointerEvents}`, 'info');
-      log(`   z-index: ${styles.zIndex}`, 'info');
+            .status.error {
+                background: #f44336;
+                color: white;
+            }
 
-      if (container.shadowRoot) {
-        log(`✅ Shadow DOM encontrado`, 'success');
+            .status.warning {
+                background: #ff9800;
+                color: white;
+            }
 
-        const rootElement = container.shadowRoot.getElementById('pw-root');
-        if (rootElement) {
-          log(`✅ Root element encontrado`, 'success');
-          log(`   Children: ${rootElement.children.length}`, 'info');
+            .info-box {
+                background: #e3f2fd;
+                border: 1px solid #2196f3;
+                border-radius: 4px;
+                padding: 15px;
+                margin: 15px 0;
+            }
 
-          // Check for modal/overlay
-          const allElements = rootElement.querySelectorAll('*');
-          log(`   Total elementos: ${allElements.length}`, 'info');
+            .info-box strong {
+                color: #1976d2;
+            }
 
-          const overlay = rootElement.querySelector('[class*="overlay"], [class*="modal"], [class*="backdrop"]');
-          if (overlay) {
-            log(`✅ Modal/Overlay encontrado`, 'success');
-          } else {
-            log(`⚠️ Modal/Overlay não encontrado`, 'warning');
-          }
-        }
-      }
-    }
+            .code-block {
+                background: #263238;
+                color: #aed581;
+                padding: 15px;
+                border-radius: 4px;
+                overflow-x: auto;
+                font-family: "Courier New", monospace;
+                font-size: 14px;
+                margin: 10px 0;
+            }
 
-    // Test Functions
-    function runAllTests() {
-      log('🧪 Executando todos os testes...', 'info');
-      testShadowDOMDetection();
-      testStyleIsolation();
-      testDOMInspection();
-    }
+            button {
+                background: #2196f3;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
 
-    function testShadowDOMDetection() {
-      log('Test 1: Detectando Shadow DOM...', 'info');
-      const status = document.getElementById('status-1');
-      const result = document.getElementById('result-1');
+            button:hover {
+                background: #1976d2;
+            }
 
-      // Check if Shadow DOM is supported
-      const supported = 'attachShadow' in Element.prototype;
+            button.secondary {
+                background: #757575;
+            }
 
-      if (!supported) {
-        status.className = 'status error';
-        status.textContent = 'Não Suportado';
-        result.innerHTML = '<strong>❌ Shadow DOM não é suportado neste navegador.</strong><br>O widget usará iframe como fallback.';
-        result.style.display = 'block';
-        log('❌ Shadow DOM não suportado pelo navegador', 'error');
-        return;
-      }
+            button.secondary:hover {
+                background: #616161;
+            }
 
-      log('✅ Shadow DOM é suportado pelo navegador', 'success');
+            #console-output {
+                background: #263238;
+                color: #aed581;
+                padding: 15px;
+                border-radius: 4px;
+                max-height: 400px;
+                overflow-y: auto;
+                font-family: "Courier New", monospace;
+                font-size: 13px;
+                line-height: 1.6;
+            }
 
-      // Find widget container
-      const container = document.querySelector('[id^="__payment_widget_root__"]');
+            .log-entry {
+                margin: 5px 0;
+            }
 
-      if (!container) {
-        status.className = 'status warning';
-        status.textContent = 'Widget não encontrado';
-        result.innerHTML = '<strong>⚠️ Container do widget não encontrado.</strong><br>Inicialize o widget primeiro.';
-        result.style.display = 'block';
-        log('⚠️ Container do widget não encontrado', 'warning');
-        return;
-      }
+            .log-entry.info {
+                color: #64b5f6;
+            }
 
-      log(`✅ Container encontrado: ${container.id}`, 'success');
+            .log-entry.success {
+                color: #81c784;
+            }
 
-      // Check if Shadow DOM exists
-      if (container.shadowRoot) {
-        status.className = 'status success';
-        status.textContent = '✅ Funcionando';
-        result.innerHTML = `
+            .log-entry.error {
+                color: #e57373;
+            }
+
+            .log-entry.warning {
+                color: #ffb74d;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>🔍 Shadow DOM Test - Payment Widget</h1>
+            <p class="subtitle">
+                Teste e verifique se o Shadow DOM está funcionando corretamente
+            </p>
+
+            <!-- Test Section 1: Shadow DOM Detection -->
+            <div class="test-section">
+                <h2>
+                    1️⃣ Detecção de Shadow DOM
+                    <span id="status-1" class="status">Aguardando...</span>
+                </h2>
+                <p>
+                    Verifica se o navegador suporta Shadow DOM e se ele foi
+                    criado corretamente.
+                </p>
+                <div id="result-1" class="info-box" style="display: none"></div>
+            </div>
+
+            <!-- Test Section 2: Style Isolation -->
+            <div class="test-section">
+                <h2>
+                    2️⃣ Isolamento de Estilos
+                    <span id="status-2" class="status">Aguardando...</span>
+                </h2>
+                <p>
+                    Testa se os estilos CSS estão isolados entre a página e o
+                    Shadow DOM.
+                </p>
+                <div id="result-2" class="info-box" style="display: none"></div>
+            </div>
+
+            <!-- Test Section 3: DOM Inspection -->
+            <div class="test-section">
+                <h2>
+                    3️⃣ Inspeção do DOM
+                    <span id="status-3" class="status">Aguardando...</span>
+                </h2>
+                <p>Mostra a estrutura do DOM e do Shadow DOM.</p>
+                <div id="result-3" class="info-box" style="display: none"></div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div style="margin: 30px 0">
+                <button onclick="initWidget()">🚀 Inicializar Widget</button>
+                <button onclick="openWidget()" class="secondary">
+                    📖 Abrir Widget
+                </button>
+                <button onclick="closeWidget()" class="secondary">
+                    🚪 Fechar Widget
+                </button>
+                <button onclick="runAllTests()" class="secondary">
+                    🧪 Executar Testes
+                </button>
+                <button onclick="inspectWidget()" class="secondary">
+                    🔍 Inspecionar Widget
+                </button>
+                <button onclick="clearConsole()" class="secondary">
+                    🗑️ Limpar Console
+                </button>
+            </div>
+
+            <!-- Console Output -->
+            <div class="test-section">
+                <h2>📋 Console de Logs</h2>
+                <div id="console-output"></div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="info-box" style="margin-top: 30px">
+                <h3 style="margin-top: 0">💡 Como verificar no DevTools:</h3>
+                <ol>
+                    <li>Abra o DevTools (F12 ou Cmd+Option+I no Mac)</li>
+                    <li>Vá para a aba "Elements" ou "Inspetor"</li>
+                    <li>
+                        Procure por um elemento com
+                        <code>#shadow-root (open)</code>
+                    </li>
+                    <li>Expanda o shadow-root para ver o conteúdo isolado</li>
+                    <li>
+                        Tente selecionar elementos dentro do Shadow DOM - eles
+                        estarão isolados
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Widget Bootstrap Script -->
+        <script>
+            // Console Logger
+            function log(message, type = "info") {
+                const consoleOutput = document.getElementById("console-output");
+                const timestamp = new Date().toLocaleTimeString();
+                const entry = document.createElement("div");
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `[${timestamp}] ${message}`;
+                consoleOutput.appendChild(entry);
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+
+            function clearConsole() {
+                document.getElementById("console-output").innerHTML = "";
+                log("Console limpo", "info");
+            }
+
+            // Initialize Widget
+            async function initWidget() {
+                log("🚀 Iniciando widget...", "info");
+
+                try {
+                    // Load bootstrap script
+                    if (!window.PaymentWidget) {
+                        log("Carregando script do bootstrap...", "info");
+                        const script = document.createElement("script");
+                        script.src =
+                            "https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js";
+                        script.async = true;
+
+                        script.onload = async () => {
+                            log(
+                                "✅ Bootstrap carregado com sucesso",
+                                "success",
+                            );
+                            await actualInit();
+                        };
+
+                        script.onerror = () => {
+                            log("❌ Erro ao carregar bootstrap", "error");
+                        };
+
+                        document.head.appendChild(script);
+                    } else {
+                        await actualInit();
+                    }
+                } catch (error) {
+                    log(`❌ Erro na inicialização: ${error.message}`, "error");
+                }
+            }
+
+            async function actualInit() {
+                try {
+                    await window.PaymentWidget.init({
+                        orderId: "test_shadow_dom_123",
+                        environment: "staging",
+                        theme: {
+                            primaryColor: "#2196F3",
+                            secondaryColor: "#4CAF50",
+                        },
+                        onOpen: () => {
+                            log("🔔 Callback onOpen chamado", "success");
+                        },
+                        onClose: () => {
+                            log("🔔 Callback onClose chamado", "info");
+                        },
+                        onError: (error) => {
+                            log(
+                                `🔔 Callback onError: ${error.message}`,
+                                "error",
+                            );
+                        },
+                    });
+
+                    log("✅ Widget inicializado com sucesso", "success");
+
+                    // Log container state
+                    const container = document.querySelector(
+                        '[id^="__payment_widget_root__"]',
+                    );
+                    if (container) {
+                        const styles = window.getComputedStyle(container);
+                        log(`📦 Container display: ${styles.display}`, "info");
+                        log(
+                            `📦 Container pointer-events: ${styles.pointerEvents}`,
+                            "info",
+                        );
+                        log(`📦 Container z-index: ${styles.zIndex}`, "info");
+                    }
+
+                    // Run tests automatically after init
+                    setTimeout(() => {
+                        runAllTests();
+                    }, 1000);
+                } catch (error) {
+                    log(`❌ Erro ao inicializar: ${error.message}`, "error");
+                }
+            }
+
+            function openWidget() {
+                if (window.PaymentWidget) {
+                    log("📖 Chamando PaymentWidget.open()...", "info");
+                    window.PaymentWidget.open();
+
+                    // Check state after opening
+                    setTimeout(() => {
+                        const state = window.PaymentWidget.getState();
+                        log(
+                            `🔍 Estado após open: isOpen=${state.isOpen}, isLoaded=${state.isLoaded}`,
+                            "info",
+                        );
+
+                        const container = document.querySelector(
+                            '[id^="__payment_widget_root__"]',
+                        );
+                        if (container) {
+                            const styles = window.getComputedStyle(container);
+                            log(
+                                `� Container após open - display: ${styles.display}`,
+                                "info",
+                            );
+                            log(
+                                `📦 Container após open - visibility: ${styles.visibility}`,
+                                "info",
+                            );
+
+                            if (container.shadowRoot) {
+                                const rootElement =
+                                    container.shadowRoot.getElementById(
+                                        "pw-root",
+                                    );
+                                if (rootElement) {
+                                    log(
+                                        `✅ Root element encontrado no Shadow DOM`,
+                                        "success",
+                                    );
+                                    log(
+                                        `📦 Root element children: ${rootElement.children.length}`,
+                                        "info",
+                                    );
+
+                                    // Check if React rendered anything
+                                    const reactRoot =
+                                        rootElement.querySelector(
+                                            '[class*="payment"]',
+                                        );
+                                    if (reactRoot) {
+                                        log(
+                                            `✅ Componente React renderizado`,
+                                            "success",
+                                        );
+                                    } else {
+                                        log(
+                                            `⚠️ Componente React não encontrado`,
+                                            "warning",
+                                        );
+                                    }
+                                } else {
+                                    log(
+                                        `❌ Root element não encontrado`,
+                                        "error",
+                                    );
+                                }
+                            }
+                        }
+                    }, 500);
+                } else {
+                    log(
+                        '⚠️ Widget não inicializado. Clique em "Inicializar Widget" primeiro.',
+                        "warning",
+                    );
+                }
+            }
+
+            function closeWidget() {
+                if (window.PaymentWidget) {
+                    log("🚪 Chamando PaymentWidget.close()...", "info");
+                    window.PaymentWidget.close();
+
+                    setTimeout(() => {
+                        const state = window.PaymentWidget.getState();
+                        log(
+                            `🔍 Estado após close: isOpen=${state.isOpen}`,
+                            "info",
+                        );
+                    }, 300);
+                } else {
+                    log("⚠️ Widget não inicializado.", "warning");
+                }
+            }
+
+            function inspectWidget() {
+                log("🔍 Inspecionando widget...", "info");
+
+                if (!window.PaymentWidget) {
+                    log("❌ PaymentWidget não disponível", "error");
+                    return;
+                }
+
+                const state = window.PaymentWidget.getState();
+                log(
+                    `📊 Estado: isOpen=${state.isOpen}, isLoaded=${state.isLoaded}`,
+                    "info",
+                );
+
+                const container = document.querySelector(
+                    '[id^="__payment_widget_root__"]',
+                );
+                if (!container) {
+                    log("❌ Container não encontrado", "error");
+                    return;
+                }
+
+                log(`✅ Container: ${container.id}`, "success");
+
+                const styles = window.getComputedStyle(container);
+                log(`📦 Container styles:`, "info");
+                log(`   display: ${styles.display}`, "info");
+                log(`   visibility: ${styles.visibility}`, "info");
+                log(`   pointer-events: ${styles.pointerEvents}`, "info");
+                log(`   z-index: ${styles.zIndex}`, "info");
+
+                if (container.shadowRoot) {
+                    log(`✅ Shadow DOM encontrado`, "success");
+
+                    const rootElement =
+                        container.shadowRoot.getElementById("pw-root");
+                    if (rootElement) {
+                        log(`✅ Root element encontrado`, "success");
+                        log(
+                            `   Children: ${rootElement.children.length}`,
+                            "info",
+                        );
+
+                        // Check for modal/overlay
+                        const allElements = rootElement.querySelectorAll("*");
+                        log(
+                            `   Total elementos: ${allElements.length}`,
+                            "info",
+                        );
+
+                        const overlay = rootElement.querySelector(
+                            '[class*="overlay"], [class*="modal"], [class*="backdrop"]',
+                        );
+                        if (overlay) {
+                            log(`✅ Modal/Overlay encontrado`, "success");
+                        } else {
+                            log(`⚠️ Modal/Overlay não encontrado`, "warning");
+                        }
+                    }
+                }
+            }
+
+            // Test Functions
+            function runAllTests() {
+                log("🧪 Executando todos os testes...", "info");
+                testShadowDOMDetection();
+                testStyleIsolation();
+                testDOMInspection();
+            }
+
+            function testShadowDOMDetection() {
+                log("Test 1: Detectando Shadow DOM...", "info");
+                const status = document.getElementById("status-1");
+                const result = document.getElementById("result-1");
+
+                // Check if Shadow DOM is supported
+                const supported = "attachShadow" in Element.prototype;
+
+                if (!supported) {
+                    status.className = "status error";
+                    status.textContent = "Não Suportado";
+                    result.innerHTML =
+                        "<strong>❌ Shadow DOM não é suportado neste navegador.</strong><br>O widget usará iframe como fallback.";
+                    result.style.display = "block";
+                    log("❌ Shadow DOM não suportado pelo navegador", "error");
+                    return;
+                }
+
+                log("✅ Shadow DOM é suportado pelo navegador", "success");
+
+                // Find widget container
+                const container = document.querySelector(
+                    '[id^="__payment_widget_root__"]',
+                );
+
+                if (!container) {
+                    status.className = "status warning";
+                    status.textContent = "Widget não encontrado";
+                    result.innerHTML =
+                        "<strong>⚠️ Container do widget não encontrado.</strong><br>Inicialize o widget primeiro.";
+                    result.style.display = "block";
+                    log("⚠️ Container do widget não encontrado", "warning");
+                    return;
+                }
+
+                log(`✅ Container encontrado: ${container.id}`, "success");
+
+                // Check if Shadow DOM exists
+                if (container.shadowRoot) {
+                    status.className = "status success";
+                    status.textContent = "✅ Funcionando";
+                    result.innerHTML = `
           <strong>✅ Shadow DOM criado com sucesso!</strong><br><br>
           <strong>Detalhes:</strong><br>
           • Mode: ${container.shadowRoot.mode}<br>
           • Host: ${container.id}<br>
           • Children: ${container.shadowRoot.children.length} elemento(s)<br>
-          • Root element: ${container.shadowRoot.getElementById('pw-root') ? '✅ Encontrado' : '❌ Não encontrado'}
+          • Root element: ${container.shadowRoot.getElementById("pw-root") ? "✅ Encontrado" : "❌ Não encontrado"}
         `;
-        result.style.display = 'block';
-        log('✅ Shadow DOM criado e funcionando corretamente', 'success');
-        log(`   Mode: ${container.shadowRoot.mode}`, 'info');
-        log(`   Children: ${container.shadowRoot.children.length}`, 'info');
-      } else {
-        // Check for iframe fallback
-        const iframe = container.querySelector('iframe');
-        if (iframe) {
-          status.className = 'status warning';
-          status.textContent = 'Iframe Fallback';
-          result.innerHTML = '<strong>⚠️ Usando iframe como fallback.</strong><br>Shadow DOM não foi criado, mas o iframe fornece isolamento similar.';
-          result.style.display = 'block';
-          log('⚠️ Usando iframe fallback', 'warning');
-        } else {
-          status.className = 'status error';
-          status.textContent = '❌ Erro';
-          result.innerHTML = '<strong>❌ Shadow DOM não criado e nenhum fallback encontrado.</strong>';
-          result.style.display = 'block';
-          log('❌ Nenhum isolamento encontrado (Shadow DOM ou iframe)', 'error');
-        }
-      }
-    }
+                    result.style.display = "block";
+                    log(
+                        "✅ Shadow DOM criado e funcionando corretamente",
+                        "success",
+                    );
+                    log(`   Mode: ${container.shadowRoot.mode}`, "info");
+                    log(
+                        `   Children: ${container.shadowRoot.children.length}`,
+                        "info",
+                    );
+                } else {
+                    // Check for iframe fallback
+                    const iframe = container.querySelector("iframe");
+                    if (iframe) {
+                        status.className = "status warning";
+                        status.textContent = "Iframe Fallback";
+                        result.innerHTML =
+                            "<strong>⚠️ Usando iframe como fallback.</strong><br>Shadow DOM não foi criado, mas o iframe fornece isolamento similar.";
+                        result.style.display = "block";
+                        log("⚠️ Usando iframe fallback", "warning");
+                    } else {
+                        status.className = "status error";
+                        status.textContent = "❌ Erro";
+                        result.innerHTML =
+                            "<strong>❌ Shadow DOM não criado e nenhum fallback encontrado.</strong>";
+                        result.style.display = "block";
+                        log(
+                            "❌ Nenhum isolamento encontrado (Shadow DOM ou iframe)",
+                            "error",
+                        );
+                    }
+                }
+            }
 
-    function testStyleIsolation() {
-      log('Test 2: Testando isolamento de estilos...', 'info');
-      const status = document.getElementById('status-2');
-      const result = document.getElementById('result-2');
+            function testStyleIsolation() {
+                log("Test 2: Testando isolamento de estilos...", "info");
+                const status = document.getElementById("status-2");
+                const result = document.getElementById("result-2");
 
-      const container = document.querySelector('[id^="__payment_widget_root__"]');
+                const container = document.querySelector(
+                    '[id^="__payment_widget_root__"]',
+                );
 
-      if (!container || !container.shadowRoot) {
-        status.className = 'status warning';
-        status.textContent = 'Não testado';
-        result.innerHTML = '<strong>⚠️ Shadow DOM não disponível para teste.</strong>';
-        result.style.display = 'block';
-        log('⚠️ Shadow DOM não disponível para teste de estilos', 'warning');
-        return;
-      }
+                if (!container || !container.shadowRoot) {
+                    status.className = "status warning";
+                    status.textContent = "Não testado";
+                    result.innerHTML =
+                        "<strong>⚠️ Shadow DOM não disponível para teste.</strong>";
+                    result.style.display = "block";
+                    log(
+                        "⚠️ Shadow DOM não disponível para teste de estilos",
+                        "warning",
+                    );
+                    return;
+                }
 
-      // Test style isolation
-      const testDiv = document.createElement('div');
-      testDiv.className = 'test-isolation';
-      testDiv.style.cssText = 'background: red; color: white; padding: 10px;';
-      testDiv.textContent = 'Este elemento está FORA do Shadow DOM';
+                // Test style isolation
+                const testDiv = document.createElement("div");
+                testDiv.className = "test-isolation";
+                testDiv.style.cssText =
+                    "background: red; color: white; padding: 10px;";
+                testDiv.textContent = "Este elemento está FORA do Shadow DOM";
 
-      const shadowTestDiv = container.shadowRoot.querySelector('#pw-root');
+                const shadowTestDiv =
+                    container.shadowRoot.querySelector("#pw-root");
 
-      if (shadowTestDiv) {
-        status.className = 'status success';
-        status.textContent = '✅ Isolado';
-        result.innerHTML = `
+                if (shadowTestDiv) {
+                    status.className = "status success";
+                    status.textContent = "✅ Isolado";
+                    result.innerHTML = `
           <strong>✅ Estilos estão isolados corretamente!</strong><br><br>
           <strong>O que isso significa:</strong><br>
           • Estilos da página não afetam o widget<br>
@@ -507,68 +628,77 @@
           • Classes CSS não conflitam<br>
           • CSS Variables podem ser usadas para temas
         `;
-        result.style.display = 'block';
-        log('✅ Isolamento de estilos funcionando', 'success');
-      } else {
-        status.className = 'status warning';
-        status.textContent = 'Parcial';
-        result.innerHTML = '<strong>⚠️ Elemento root não encontrado no Shadow DOM.</strong>';
-        result.style.display = 'block';
-        log('⚠️ Elemento root não encontrado', 'warning');
-      }
-    }
+                    result.style.display = "block";
+                    log("✅ Isolamento de estilos funcionando", "success");
+                } else {
+                    status.className = "status warning";
+                    status.textContent = "Parcial";
+                    result.innerHTML =
+                        "<strong>⚠️ Elemento root não encontrado no Shadow DOM.</strong>";
+                    result.style.display = "block";
+                    log("⚠️ Elemento root não encontrado", "warning");
+                }
+            }
 
-    function testDOMInspection() {
-      log('Test 3: Inspecionando estrutura do DOM...', 'info');
-      const status = document.getElementById('status-3');
-      const result = document.getElementById('result-3');
+            function testDOMInspection() {
+                log("Test 3: Inspecionando estrutura do DOM...", "info");
+                const status = document.getElementById("status-3");
+                const result = document.getElementById("result-3");
 
-      const container = document.querySelector('[id^="__payment_widget_root__"]');
+                const container = document.querySelector(
+                    '[id^="__payment_widget_root__"]',
+                );
 
-      if (!container) {
-        status.className = 'status warning';
-        status.textContent = 'Widget não encontrado';
-        result.innerHTML = '<strong>⚠️ Widget não inicializado.</strong>';
-        result.style.display = 'block';
-        log('⚠️ Widget não encontrado para inspeção', 'warning');
-        return;
-      }
+                if (!container) {
+                    status.className = "status warning";
+                    status.textContent = "Widget não encontrado";
+                    result.innerHTML =
+                        "<strong>⚠️ Widget não inicializado.</strong>";
+                    result.style.display = "block";
+                    log("⚠️ Widget não encontrado para inspeção", "warning");
+                    return;
+                }
 
-      let structure = `<strong>Estrutura do DOM:</strong><br><br>`;
-      structure += `<code>div#${container.id}</code> (Container principal)<br>`;
+                let structure = `<strong>Estrutura do DOM:</strong><br><br>`;
+                structure += `<code>div#${container.id}</code> (Container principal)<br>`;
 
-      if (container.shadowRoot) {
-        structure += `├─ <code>#shadow-root (${container.shadowRoot.mode})</code><br>`;
+                if (container.shadowRoot) {
+                    structure += `├─ <code>#shadow-root (${container.shadowRoot.mode})</code><br>`;
 
-        const children = Array.from(container.shadowRoot.children);
-        children.forEach((child, index) => {
-          const isLast = index === children.length - 1;
-          const prefix = isLast ? '└─' : '├─';
-          structure += `│  ${prefix} <code>${child.tagName.toLowerCase()}#${child.id || 'no-id'}</code><br>`;
-        });
+                    const children = Array.from(container.shadowRoot.children);
+                    children.forEach((child, index) => {
+                        const isLast = index === children.length - 1;
+                        const prefix = isLast ? "└─" : "├─";
+                        structure += `│  ${prefix} <code>${child.tagName.toLowerCase()}#${child.id || "no-id"}</code><br>`;
+                    });
 
-        log('✅ Estrutura do Shadow DOM mapeada', 'success');
-      } else {
-        const iframe = container.querySelector('iframe');
-        if (iframe) {
-          structure += `└─ <code>iframe#${iframe.id}</code> (Fallback)<br>`;
-          log('✅ Estrutura do iframe fallback mapeada', 'success');
-        } else {
-          structure += `└─ <em>Nenhum conteúdo isolado encontrado</em><br>`;
-          log('⚠️ Nenhuma estrutura de isolamento encontrada', 'warning');
-        }
-      }
+                    log("✅ Estrutura do Shadow DOM mapeada", "success");
+                } else {
+                    const iframe = container.querySelector("iframe");
+                    if (iframe) {
+                        structure += `└─ <code>iframe#${iframe.id}</code> (Fallback)<br>`;
+                        log(
+                            "✅ Estrutura do iframe fallback mapeada",
+                            "success",
+                        );
+                    } else {
+                        structure += `└─ <em>Nenhum conteúdo isolado encontrado</em><br>`;
+                        log(
+                            "⚠️ Nenhuma estrutura de isolamento encontrada",
+                            "warning",
+                        );
+                    }
+                }
 
-      status.className = 'status success';
-      status.textContent = '✅ Mapeado';
-      result.innerHTML = structure;
-      result.style.display = 'block';
-    }
+                status.className = "status success";
+                status.textContent = "✅ Mapeado";
+                result.innerHTML = structure;
+                result.style.display = "block";
+            }
 
-    // Initial log
-    log('🎯 Página de teste do Shadow DOM carregada', 'success');
-    log('👉 Clique em "Inicializar Widget" para começar', 'info');
-  </script>
-</body>
-
+            // Initial log
+            log("🎯 Página de teste do Shadow DOM carregada", "success");
+            log('👉 Clique em "Inicializar Widget" para começar', "info");
+        </script>
+    </body>
 </html>

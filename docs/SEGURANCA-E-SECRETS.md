@@ -39,7 +39,7 @@
 │  │  • Recebe dados do widget                            │  │
 │  │  • TEM as API keys (server-side)                     │  │
 │  │  • TEM os secrets                                    │  │
-│  │  • Valida merchantId                                 │  │
+│  │  • Valida orderId                                 │  │
 │  │  • Faz requests para API de pagamento               │  │
 │  └──────────────────┬───────────────────────────────────┘  │
 │                     │                                       │
@@ -68,7 +68,7 @@
 ```typescript
 // ✅ SEGURO - Pode ficar no frontend
 window.PaymentWidget.init({
-  merchantId: "merchant-123", // ✅ ID público
+  orderId: "merchant-123", // ✅ ID público
   environment: "production", // ✅ Config pública
   logoUrl: "https://...", // ✅ URL pública
   apiBaseUrl: "https://seu-backend.com", // ✅ SEU backend, não a API de pagamento
@@ -96,7 +96,7 @@ onSuccess: async (data) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      merchantId: data.merchantId,
+      orderId: data.orderId,
       token: data.token,  // Token temporário do widget
       // Seu backend que terá a API key real
     }),
@@ -167,7 +167,7 @@ const config = {
 <script>
   window.PaymentWidget.init({
     // ✅ Apenas identificadores públicos
-    merchantId: "merchant-123",
+    orderId: "merchant-123",
 
     // ✅ Aponta para SEU backend (não a API de pagamento)
     apiBaseUrl: "https://seu-ecommerce.com/api",
@@ -183,7 +183,7 @@ const config = {
           },
           body: JSON.stringify({
             token: data.token, // Token do widget
-            merchantId: data.merchantId,
+            orderId: data.orderId,
             amount: 10000, // R$ 100,00
             installments: data.installments,
           }),
@@ -222,10 +222,10 @@ const PAYMENT_API_URL = process.env.PAYMENT_API_URL;
 
 router.post("/process-payment", async (req, res) => {
   try {
-    const { token, merchantId, amount, installments } = req.body;
+    const { token, orderId, amount, installments } = req.body;
 
-    // 1. Validar merchantId (verificar se é válido para este cliente)
-    if (!isValidMerchant(merchantId)) {
+    // 1. Validar orderId (verificar se é válido para este cliente)
+    if (!isValidMerchant(orderId)) {
       return res.status(403).json({
         success: false,
         message: "Merchant inválido",
@@ -243,7 +243,7 @@ router.post("/process-payment", async (req, res) => {
         token,
         amount,
         installments,
-        merchantId,
+        orderId,
         metadata: {
           source: "payment-widget",
           ip: req.ip,
@@ -276,10 +276,10 @@ router.post("/process-payment", async (req, res) => {
   }
 });
 
-function isValidMerchant(merchantId: string): boolean {
+function isValidMerchant(orderId: string): boolean {
   // Validar contra seu banco de dados
   const validMerchants = process.env.VALID_MERCHANTS?.split(",") || [];
-  return validMerchants.includes(merchantId);
+  return validMerchants.includes(orderId);
 }
 
 export default router;
@@ -314,7 +314,7 @@ SESSION_SECRET=your-session-secret-here
 
 ```typescript
 // ✅ PODE ficar no frontend
-merchantId: "merchant-123"; // Identificador público
+orderId: "merchant-123"; // Identificador público
 publishableKey: "pk_live_xyz..."; // Key pública (se aplicável)
 ```
 
@@ -422,7 +422,7 @@ import validator from "validator";
 
 export function sanitizePaymentData(data: any) {
   return {
-    merchantId: validator.escape(data.merchantId),
+    orderId: validator.escape(data.orderId),
     amount: Number.parseInt(data.amount),
     installments: Number.parseInt(data.installments),
     token: validator.escape(data.token),
@@ -436,7 +436,7 @@ export function sanitizePaymentData(data: any) {
 
 ### Frontend (Widget)
 
-- [ ] ✅ Apenas `merchantId` público na configuração
+- [ ] ✅ Apenas `orderId` público na configuração
 - [ ] ✅ Sem API keys ou secrets no código
 - [ ] ✅ HTTPS obrigatório em produção
 - [ ] ✅ Callbacks enviam dados para SEU backend
@@ -447,7 +447,7 @@ export function sanitizePaymentData(data: any) {
 ### Backend (Seu Servidor)
 
 - [ ] ✅ API keys em variáveis de ambiente (`.env`)
-- [ ] ✅ Validação de merchantId
+- [ ] ✅ Validação de orderId
 - [ ] ✅ CORS configurado corretamente
 - [ ] ✅ Rate limiting implementado
 - [ ] ✅ Logs de todas as transações

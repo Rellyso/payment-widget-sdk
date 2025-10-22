@@ -299,7 +299,7 @@ export default defineConfig({
 ```typescript
 // src/types/index.ts
 export interface WidgetConfig {
-  merchantId: string;
+  orderId: string;
   publicKey: string;
   environment?: "sandbox" | "production";
   theme?: {
@@ -432,7 +432,7 @@ export type { WidgetConfig, WidgetInstance, PaymentResult } from "../types";
 import { mount } from "@seu-pacote/payment-widget";
 
 const widget = mount(document.getElementById("widget"), {
-  merchantId: "merchant_123",
+  orderId: "merchant_123",
   publicKey: "pk_live_...",
 });
 
@@ -496,7 +496,7 @@ window.CartaoSimplesWidget = { mount };
   const widget = window.CartaoSimplesWidget.mount(
     document.getElementById("payment-widget"),
     {
-      merchantId: "merchant_123",
+      orderId: "merchant_123",
       publicKey: "pk_live_...",
     }
   );
@@ -513,7 +513,7 @@ const CDN_BASE_URL = "https://d2x7cg3k3on9lk.cloudfront.net";
 const WIDGET_VERSION = "v1";
 
 interface BootstrapConfig {
-  merchantId: string;
+  orderId: string;
   publicKey: string;
   autoOpen?: boolean;
   [key: string]: any;
@@ -599,7 +599,7 @@ class PaymentWidgetBootstrap {
 <script>
   // Bootstrap carrega o widget sob demanda
   window.PaymentWidget.init({
-    merchantId: "merchant_123",
+    orderId: "merchant_123",
     publicKey: "pk_live_...",
     autoOpen: true,
   });
@@ -1000,10 +1000,10 @@ Widget → Tokeniza Cartão → Backend Processa Token → Resposta
 ### 9.2 Validação de Merchant
 
 ```typescript
-export async function validateMerchant(merchantId: string): Promise<boolean> {
+export async function validateMerchant(orderId: string): Promise<boolean> {
   try {
     const response = await fetch(
-      `https://api.seu-backend.com/merchants/${merchantId}/validate`,
+      `https://api.seu-backend.com/merchants/${orderId}/validate`,
       {
         headers: {
           "X-Public-Key": config.publicKey,
@@ -1115,7 +1115,7 @@ public/examples/
       const widget = window.CartaoSimplesWidget.mount(
         document.getElementById("payment-widget"),
         {
-          merchantId: "test_merchant",
+          orderId: "test_merchant",
           publicKey: "pk_test_123",
           environment: "sandbox",
         }
@@ -1157,7 +1157,7 @@ describe("PaymentWidget", () => {
     render(
       <PaymentWidget
         config={{
-          merchantId: "test",
+          orderId: "test",
           publicKey: "pk_test",
         }}
       />
