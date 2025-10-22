@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import "./styles/widget.css";
 import App from "./App.tsx";
+import "@fontsource-variable/inter/wght.css";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

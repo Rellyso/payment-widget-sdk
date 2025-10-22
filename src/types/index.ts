@@ -1,6 +1,6 @@
 export type WidgetConfig = {
   /** ID único do merchant/parceiro */
-  merchantId: string;
+  orderId: string;
 
   /** Chave da API do merchant */
   apiKey?: string;
@@ -40,7 +40,7 @@ export type WidgetConfig = {
 export type PaymentSuccessData = {
   transactionId: string;
   token: string;
-  merchantId: string;
+  orderId: string;
   amount?: number;
   installments?: number;
   timestamp: string;
@@ -79,11 +79,24 @@ export type PaymentData = {
   installments: number;
 };
 
+export type Option = {
+  id?: string;
+  value: string | number;
+  label: string;
+  extraLabel?: string;
+}
+
+export type MapOptions = Map<string | number, Option>;
+
 export const WIDGET_STEPS = {
-  AUTHORIZATION: "authorization",
   CREDIT_ANALYSIS: "credit-analysis",
+  TOKEN_VALIDATION: "token-validation",
+  TOKEN_RESULT: "token-result",
+  AUTHORIZATION: "authorization",
   ANALYSIS_RESULT: "analysis-result",
   ADDRESS_FORM: "address-form",
+  QR_CODE_IDENTITY_VALIDATION: "qr-code-identity-validation",
+  IDENTITY_VALIDATION_RESULT: "identity-validation-result",
   PAYMENT_FORM: "payment-form",
   CONFIRMATION: "confirmation",
 } as const;

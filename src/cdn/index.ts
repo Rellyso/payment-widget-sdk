@@ -1,10 +1,10 @@
 // CDN Entry Point - Bundle completo com React incluído
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { PaymentWidget } from "../components/PaymentWidget";
 import type { WidgetConfig } from "../types";
 import "../styles/widget.css";
 import "../styles/widget-native.css";
+import { PaymentWidget } from "@/components/payment-widget";
 
 // Garante que React está disponível globalmente
 (
