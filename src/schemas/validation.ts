@@ -65,39 +65,54 @@ export const widgetConfigSchema = z.object({
 });
 
 // Schema para análise de crédito
-export const creditAnalysisSchema = z.object({
-  firstName: z.string().min(1, { message: 'O nome é obrigatório' }),
-  lastName: z.string().min(1, { message: 'O sobrenome é obrigatório' }),
-  phone: z
-    .string()
-    .regex(PHONE_REGEX, "Telefone deve estar no formato (00) 00000-0000"),
-  birthDate: z
-    .string()
-    .regex(DATE_FORMAT_REGEX, "Data deve estar no formato DD/MM/AAAA")
-    .refine(validateAge, "Você deve ter pelo menos 18 anos"),
-  email: z
-    .string()
-    .email("Email deve ser válido")
-    .max(MAX_EMAIL_LENGTH, "Email deve ter no máximo 100 caracteres"),
-  password: z
-    .string()
-    .min(MIN_PASSWORD_LENGTH, "No mínimo 8 caracteres")
-    .regex(
-      PASSWORD_UPPERCASE_REGEX,
-      "Deve conter pelo menos uma letra maiúscula"
-    )
-    .regex(
-      PASSWORD_LOWERCASE_REGEX,
-      "Deve conter pelo menos uma letra minúscula"
-    )
-    .regex(PASSWORD_NUMBER_REGEX, "Deve conter pelo menos um número")
-    .regex(PASSWORD_NO_SPACES_REGEX, "Não deve conter espaços")
-    .regex(
-      PASSWORD_SPECIAL_CHAR_REGEX,
-      "Deve conter ao menos um caractere especial"
-    ),
-  confirmPassword: z.string(),
-});
+export const creditAnalysisSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, { message: "O nome deve ter pelo menos 2 caracteres" })
+      .regex(LETTERS_ONLY_REGEX, {
+        message: "O nome deve conter apenas letras e espaços",
+      }),
+    lastName: z
+      .string()
+      .min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres" })
+      .regex(LETTERS_ONLY_REGEX, {
+        message: "O sobrenome deve conter apenas letras e espaços",
+      }),
+    phone: z
+      .string()
+      .regex(PHONE_REGEX, "Telefone deve estar no formato (00) 00000-0000"),
+    birthDate: z
+      .string()
+      .regex(DATE_FORMAT_REGEX, "Data deve estar no formato DD/MM/AAAA")
+      .refine(validateAge, "Você deve ter pelo menos 18 anos"),
+    email: z
+      .string()
+      .email("Email deve ser válido")
+      .max(MAX_EMAIL_LENGTH, "Email deve ter no máximo 100 caracteres"),
+    password: z
+      .string()
+      .min(MIN_PASSWORD_LENGTH, "No mínimo 8 caracteres")
+      .regex(
+        PASSWORD_UPPERCASE_REGEX,
+        "Deve conter pelo menos uma letra maiúscula"
+      )
+      .regex(
+        PASSWORD_LOWERCASE_REGEX,
+        "Deve conter pelo menos uma letra minúscula"
+      )
+      .regex(PASSWORD_NUMBER_REGEX, "Deve conter pelo menos um número")
+      .regex(PASSWORD_NO_SPACES_REGEX, "Não deve conter espaços")
+      .regex(
+        PASSWORD_SPECIAL_CHAR_REGEX,
+        "Deve conter ao menos um caractere especial"
+      ),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não são iguais, tente novamente",
+    path: ["confirmPassword"],
+  });
 
 // Schema para endereço
 export const addressSchema = z.object({
@@ -158,11 +173,12 @@ export const paymentSchema = z.object({
 });
 
 export const phoneCodeSchema = z.object({
-  phoneCode: z.string({
-    message: "Informe o código recebido via SMS",
-  })
-  .length(PHONE_CODE_LENGTH, "O código deve ter 6 dígitos"),
-})
+  phoneCode: z
+    .string({
+      message: "Informe o código recebido via SMS",
+    })
+    .length(PHONE_CODE_LENGTH, "O código deve ter 6 dígitos"),
+});
 
 // Funções de validação customizadas
 function validateAge(dateString: string): boolean {

@@ -12,9 +12,9 @@ export const masks = {
   phone: (value: string): string => {
     return value
       .replace(/\D/g, "")
-      .replace(/(\d{2})(\d)/, "($1) $2")   // (00)
-      .replace(/(\d{5})(\d)/, "$1-$2")     // 00000-0000
-      .replace(/(-\d{4})\d+?$/, "$1");     // Limita a 4 dígitos finais
+      .replace(/(\d{2})(\d)/, "($1) $2") // (00)
+      .replace(/(\d{5})(\d)/, "$1-$2") // 00000-0000
+      .replace(/(-\d{4})\d+?$/, "$1"); // Limita a 4 dígitos finais
   },
 
   cep: (value: string): string => {
@@ -115,7 +115,7 @@ export const isFieldComplete = (
     phone: 15, // (00) 00000-0000
     cep: 9, // 00000-000
     cardNumber: 19, // 0000 0000 0000 0000
-    expiryDate: 7, // MM/AA
+    expiryDate: 7, // MM/AAAA
     cvv: 3, // 000 ou 0000
     date: 10, // DD/MM/AAAA
     currency: 0, // Variável
