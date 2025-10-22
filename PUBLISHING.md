@@ -576,7 +576,7 @@ CSS: https://d2x7cg3k3on9lk.cloudfront.net/widget.v1.min.css (4.6KB)
 ></script>
 <script>
   window.PaymentWidgetInit = {
-    merchantId: "merchant-123",
+    orderId: "merchant-123",
     primaryColor: "#FF6600",
     onSuccess: (data) => console.log("Sucesso:", data.token),
   };

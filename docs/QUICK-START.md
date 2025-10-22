@@ -63,7 +63,7 @@ Crie um arquivo `teste.html`:
 
         // Configurar e abrir o widget
         window.PaymentWidget.init({
-          merchantId: "test-merchant-123",
+          orderId: "test-merchant-123",
           primaryColor: "#667eea",
           secondaryColor: "#764ba2",
           logoUrl:
@@ -145,7 +145,7 @@ function App() {
       {showWidget && (
         <PaymentWidget
           config={{
-            merchantId: "test-merchant-123",
+            orderId: "test-merchant-123",
             primaryColor: "#667eea",
             environment: "staging",
             onSuccess: (data) => {
@@ -231,7 +231,7 @@ const abrirWidget = () => {
   }
 
   window.PaymentWidget.init({
-    merchantId: "test-merchant-123",
+    orderId: "test-merchant-123",
     primaryColor: "#667eea",
     environment: "staging",
     autoOpen: true,
@@ -372,7 +372,7 @@ https://cdn.cartaosimples.com.br/widget.v1.min.css
 
 ```javascript
 window.PaymentWidget.init({
-  merchantId: "seu-id",
+  orderId: "seu-id",
   primaryColor: "#FF6600", // Cor principal
   secondaryColor: "#0A0A0A", // Cor secundária
   logoUrl: "https://seusite.com/logo.png",
@@ -383,7 +383,7 @@ window.PaymentWidget.init({
 
 ```javascript
 window.PaymentWidget.init({
-  merchantId: "seu-id",
+  orderId: "seu-id",
   borderRadius: "16px", // ou 'sm', 'md', 'lg', 'full'
 });
 ```

@@ -1,394 +1,417 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Exemplo - Cartão Simples Widget</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exemplo - Cartão Simples Widget</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+            .container {
+                background: white;
+                border-radius: 16px;
+                padding: 32px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                max-width: 400px;
+                width: 100%;
+                text-align: center;
+            }
 
-    .container {
-      background: white;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-    }
+            .logo {
+                width: 60px;
+                height: 60px;
+                background: #ff6600;
+                border-radius: 12px;
+                margin: 0 auto 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+                font-weight: bold;
+                color: white;
+            }
 
-    .logo {
-      width: 60px;
-      height: 60px;
-      background: #FF6600;
-      border-radius: 12px;
-      margin: 0 auto 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: bold;
-      color: white;
-    }
+            h1 {
+                font-size: 24px;
+                color: #333;
+                margin-bottom: 8px;
+            }
 
-    h1 {
-      font-size: 24px;
-      color: #333;
-      margin-bottom: 8px;
-    }
+            .subtitle {
+                color: #666;
+                margin-bottom: 32px;
+                font-size: 16px;
+            }
 
-    .subtitle {
-      color: #666;
-      margin-bottom: 32px;
-      font-size: 16px;
-    }
+            .product {
+                background: #f8f9fa;
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 24px;
+            }
 
-    .product {
-      background: #f8f9fa;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 24px;
-    }
+            .product-name {
+                font-size: 18px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 4px;
+            }
 
-    .product-name {
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 4px;
-    }
+            .product-price {
+                font-size: 24px;
+                font-weight: 700;
+                color: #ff6600;
+                margin-bottom: 4px;
+            }
 
-    .product-price {
-      font-size: 24px;
-      font-weight: 700;
-      color: #FF6600;
-      margin-bottom: 4px;
-    }
+            .product-installments {
+                font-size: 14px;
+                color: #666;
+            }
 
-    .product-installments {
-      font-size: 14px;
-      color: #666;
-    }
+            .payment-button {
+                background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+                color: white;
+                border: none;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                width: 100%;
+                position: relative;
+                overflow: hidden;
+            }
 
-    .payment-button {
-      background: linear-gradient(135deg, #FF6600 0%, #FF8533 100%);
-      color: white;
-      border: none;
-      padding: 16px 24px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      width: 100%;
-      position: relative;
-      overflow: hidden;
-    }
+            .payment-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(255, 102, 0, 0.4);
+            }
 
-    .payment-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(255, 102, 0, 0.4);
-    }
+            .payment-button:active {
+                transform: translateY(0);
+            }
 
-    .payment-button:active {
-      transform: translateY(0);
-    }
+            .payment-button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
 
-    .payment-button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
+            .features {
+                display: flex;
+                justify-content: space-around;
+                margin: 24px 0;
+                padding: 0 16px;
+            }
 
-    .features {
-      display: flex;
-      justify-content: space-around;
-      margin: 24px 0;
-      padding: 0 16px;
-    }
+            .feature {
+                text-align: center;
+                flex: 1;
+            }
 
-    .feature {
-      text-align: center;
-      flex: 1;
-    }
+            .feature-icon {
+                width: 40px;
+                height: 40px;
+                background: #e8f4fd;
+                border-radius: 50%;
+                margin: 0 auto 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+            }
 
-    .feature-icon {
-      width: 40px;
-      height: 40px;
-      background: #e8f4fd;
-      border-radius: 50%;
-      margin: 0 auto 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
+            .feature-text {
+                font-size: 12px;
+                color: #666;
+                line-height: 1.4;
+            }
 
-    .feature-text {
-      font-size: 12px;
-      color: #666;
-      line-height: 1.4;
-    }
+            .security-badge {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                background: #f0f9ff;
+                color: #0369a1;
+                padding: 12px;
+                border-radius: 8px;
+                margin-top: 20px;
+                font-size: 14px;
+                font-weight: 500;
+            }
 
-    .security-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: #f0f9ff;
-      color: #0369a1;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 20px;
-      font-size: 14px;
-      font-weight: 500;
-    }
+            .status {
+                margin-top: 16px;
+                padding: 12px;
+                border-radius: 8px;
+                font-weight: 500;
+                display: none;
+            }
 
-    .status {
-      margin-top: 16px;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 500;
-      display: none;
-    }
+            .status.success {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #bbf7d0;
+            }
 
-    .status.success {
-      background: #dcfce7;
-      color: #166534;
-      border: 1px solid #bbf7d0;
-    }
+            .status.error {
+                background: #fef2f2;
+                color: #dc2626;
+                border: 1px solid #fecaca;
+            }
 
-    .status.error {
-      background: #fef2f2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
-    }
+            .loading {
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                border: 2px solid #ffffff33;
+                border-radius: 50%;
+                border-top-color: #fff;
+                animation: spin 1s ease-in-out infinite;
+                margin-right: 8px;
+            }
 
-    .loading {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #ffffff33;
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 8px;
-    }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
+            @media (max-width: 480px) {
+                .container {
+                    padding: 24px;
+                    margin: 16px;
+                }
 
-    @media (max-width: 480px) {
-      .container {
-        padding: 24px;
-        margin: 16px;
-      }
+                .features {
+                    flex-direction: column;
+                    gap: 16px;
+                }
 
-      .features {
-        flex-direction: column;
-        gap: 16px;
-      }
+                .feature {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    text-align: left;
+                }
 
-      .feature {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-align: left;
-      }
+                .feature-icon {
+                    margin: 0;
+                }
+            }
+        </style>
+    </head>
 
-      .feature-icon {
-        margin: 0;
-      }
-    }
-  </style>
-</head>
+    <body>
+        <div class="container">
+            <div class="logo">CS</div>
 
-<body>
-  <div class="container">
-    <div class="logo">CS</div>
+            <h1>Cartão Simples</h1>
+            <p class="subtitle">
+                Parcele sem comprometer o limite do seu cartão
+            </p>
 
-    <h1>Cartão Simples</h1>
-    <p class="subtitle">Parcele sem comprometer o limite do seu cartão</p>
+            <div class="product">
+                <div class="product-name">MacBook Pro M3</div>
+                <div class="product-price">R$ 12.999,00</div>
+                <div class="product-installments">
+                    ou até 12x de R$ 1.083,25 sem juros
+                </div>
+            </div>
 
-    <div class="product">
-      <div class="product-name">MacBook Pro M3</div>
-      <div class="product-price">R$ 12.999,00</div>
-      <div class="product-installments">ou até 12x de R$ 1.083,25 sem juros</div>
-    </div>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">Aprovação instantânea</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <div class="feature-text">100% seguro</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-text">Sem app</div>
+                </div>
+            </div>
 
-    <div class="features">
-      <div class="feature">
-        <div class="feature-icon">⚡</div>
-        <div class="feature-text">Aprovação instantânea</div>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🔒</div>
-        <div class="feature-text">100% seguro</div>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">📱</div>
-        <div class="feature-text">Sem app</div>
-      </div>
-    </div>
+            <button id="paymentButton" class="payment-button">
+                Solicitar Cartão Agora
+            </button>
 
-    <button id="paymentButton" class="payment-button">
-      Solicitar Cartão Agora
-    </button>
+            <div class="security-badge">
+                🛡️ Seus dados estão protegidos com criptografia SSL
+            </div>
 
-    <div class="security-badge">
-      🛡️ Seus dados estão protegidos com criptografia SSL
-    </div>
+            <div id="status" class="status"></div>
+        </div>
 
-    <div id="status" class="status"></div>
-  </div>
+        <!-- Widget do Cartão Simples -->
+        <script
+            src="https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js"
+            data-merchant-id="demo-merchant-123"
+            data-primary="#FF6600"
+            data-secondary="#0A0A0A"
+            data-border-radius="12px"
+            data-env="staging"
+            async
+        ></script>
 
-  <!-- Widget do Cartão Simples -->
-  <script src="https://cdn.cartaosimples.com/widget-bootstrap.v1.min.js" data-merchant-id="demo-merchant-123"
-    data-primary="#FF6600" data-secondary="#0A0A0A" data-border-radius="12px" data-env="staging" async></script>
+        <script>
+            // Estado da aplicação
+            let isLoading = false;
+            const button = document.getElementById("paymentButton");
+            const status = document.getElementById("status");
 
-  <script>
-    // Estado da aplicação
-    let isLoading = false;
-    const button = document.getElementById('paymentButton');
-    const status = document.getElementById('status');
+            // Função para mostrar status
+            function showStatus(message, type = "success") {
+                status.className = `status ${type}`;
+                status.textContent = message;
+                status.style.display = "block";
 
-    // Função para mostrar status
-    function showStatus(message, type = 'success') {
-      status.className = `status ${type}`;
-      status.textContent = message;
-      status.style.display = 'block';
+                // Esconder após 5 segundos
+                setTimeout(() => {
+                    status.style.display = "none";
+                }, 5000);
+            }
 
-      // Esconder após 5 segundos
-      setTimeout(() => {
-        status.style.display = 'none';
-      }, 5000);
-    }
+            // Função para atualizar estado do botão
+            function updateButtonState(loading) {
+                isLoading = loading;
+                button.disabled = loading;
 
-    // Função para atualizar estado do botão
-    function updateButtonState(loading) {
-      isLoading = loading;
-      button.disabled = loading;
+                if (loading) {
+                    button.innerHTML =
+                        '<span class="loading"></span>Carregando...';
+                } else {
+                    button.innerHTML = "Solicitar Cartão Agora";
+                }
+            }
 
-      if (loading) {
-        button.innerHTML = '<span class="loading"></span>Carregando...';
-      } else {
-        button.innerHTML = 'Solicitar Cartão Agora';
-      }
-    }
+            // Event listener do botão
+            button.addEventListener("click", async function () {
+                if (isLoading) return;
 
-    // Event listener do botão
-    button.addEventListener('click', async function () {
-      if (isLoading) return;
+                try {
+                    updateButtonState(true);
 
-      try {
-        updateButtonState(true);
+                    // Aguardar o widget carregar se ainda não estiver pronto
+                    if (!window.PaymentWidget) {
+                        showStatus("Carregando widget...", "info");
+                        await new Promise((resolve) =>
+                            setTimeout(resolve, 2000),
+                        );
+                    }
 
-        // Aguardar o widget carregar se ainda não estiver pronto
-        if (!window.PaymentWidget) {
-          showStatus('Carregando widget...', 'info');
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
+                    // Verificar se o widget está disponível
+                    if (!window.PaymentWidget) {
+                        throw new Error("Widget não carregou corretamente");
+                    }
 
-        // Verificar se o widget está disponível
-        if (!window.PaymentWidget) {
-          throw new Error('Widget não carregou corretamente');
-        }
+                    // Configurar e abrir o widget
+                    window.PaymentWidget.init({
+                        orderId: "demo-merchant-123",
+                        primaryColor: "#FF6600",
+                        secondaryColor: "#0A0A0A",
+                        logoUrl: "https://via.placeholder.com/120x40?text=LOGO",
+                        borderRadius: "12px",
+                        environment: "staging",
+                        autoOpen: true,
+                        onSuccess: function (data) {
+                            console.log("Sucesso:", data);
+                            showStatus(
+                                `Sucesso! Token: ${data.token}`,
+                                "success",
+                            );
 
-        // Configurar e abrir o widget
-        window.PaymentWidget.init({
-          merchantId: 'demo-merchant-123',
-          primaryColor: '#FF6600',
-          secondaryColor: '#0A0A0A',
-          logoUrl: 'https://via.placeholder.com/120x40?text=LOGO',
-          borderRadius: '12px',
-          environment: 'staging',
-          autoOpen: true,
-          onSuccess: function (data) {
-            console.log('Sucesso:', data);
-            showStatus(`Sucesso! Token: ${data.token}`, 'success');
+                            // Simular redirecionamento
+                            setTimeout(() => {
+                                alert(
+                                    "Redirecionando para página de sucesso...",
+                                );
+                            }, 2000);
+                        },
+                        onError: function (error) {
+                            console.error("Erro:", error);
+                            showStatus(`Erro: ${error.message}`, "error");
+                        },
+                        onOpen: function () {
+                            console.log("Widget aberto");
+                            updateButtonState(false);
+                        },
+                        onClose: function () {
+                            console.log("Widget fechado");
+                            updateButtonState(false);
+                        },
+                    });
+                } catch (error) {
+                    console.error("Erro ao inicializar:", error);
+                    showStatus(`Erro: ${error.message}`, "error");
+                    updateButtonState(false);
+                }
+            });
 
-            // Simular redirecionamento
-            setTimeout(() => {
-              alert('Redirecionando para página de sucesso...');
-            }, 2000);
-          },
-          onError: function (error) {
-            console.error('Erro:', error);
-            showStatus(`Erro: ${error.message}`, 'error');
-          },
-          onOpen: function () {
-            console.log('Widget aberto');
-            updateButtonState(false);
-          },
-          onClose: function () {
-            console.log('Widget fechado');
-            updateButtonState(false);
-          }
-        });
+            // Aguardar o script carregar
+            document.addEventListener("DOMContentLoaded", function () {
+                console.log("DOM carregado");
 
-      } catch (error) {
-        console.error('Erro ao inicializar:', error);
-        showStatus(`Erro: ${error.message}`, 'error');
-        updateButtonState(false);
-      }
-    });
+                // Pré-carregar widget (opcional)
+                const checkWidget = setInterval(() => {
+                    if (window.PaymentWidget) {
+                        console.log("Widget carregado e pronto");
+                        clearInterval(checkWidget);
+                    }
+                }, 100);
+            });
 
-    // Aguardar o script carregar
-    document.addEventListener('DOMContentLoaded', function () {
-      console.log('DOM carregado');
+            // Analytics e tracking (exemplo)
+            function trackEvent(event, data = {}) {
+                if (typeof gtag !== "undefined") {
+                    gtag("event", event, {
+                        event_category: "cartao_simples",
+                        ...data,
+                    });
+                }
 
-      // Pré-carregar widget (opcional)
-      const checkWidget = setInterval(() => {
-        if (window.PaymentWidget) {
-          console.log('Widget carregado e pronto');
-          clearInterval(checkWidget);
-        }
-      }, 100);
-    });
+                console.log("Track:", event, data);
+            }
 
-    // Analytics e tracking (exemplo)
-    function trackEvent(event, data = {}) {
-      if (typeof gtag !== 'undefined') {
-        gtag('event', event, {
-          event_category: 'cartao_simples',
-          ...data
-        });
-      }
+            // Tracking de eventos
+            button.addEventListener("click", () => {
+                trackEvent("button_click", { button_type: "payment_start" });
+            });
+        </script>
 
-      console.log('Track:', event, data);
-    }
-
-    // Tracking de eventos
-    button.addEventListener('click', () => {
-      trackEvent('button_click', { button_type: 'payment_start' });
-    });
-  </script>
-
-  <!-- Google Analytics (opcional) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'GA_MEASUREMENT_ID');
-  </script>
-</body>
-
+        <!-- Google Analytics (opcional) -->
+        <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"
+        ></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+            gtag("config", "GA_MEASUREMENT_ID");
+        </script>
+    </body>
 </html>

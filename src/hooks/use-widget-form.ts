@@ -19,7 +19,7 @@ export function useWidgetForm<T extends FieldValues>({
 
   const form = useForm<T>({
     resolver: zodResolver(schema),
-    mode: "onChange",
+    mode: "onSubmit",
     ...formProps,
   });
 

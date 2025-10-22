@@ -20,7 +20,7 @@ VITE_MERCHANT_ID=merchant-123
 // src/components/MyComponent.tsx
 // Funciona AUTOMATICAMENTE ✅
 const apiUrl = import.meta.env.VITE_API_URL;
-const merchantId = import.meta.env.VITE_MERCHANT_ID;
+const orderId = import.meta.env.VITE_MERCHANT_ID;
 
 console.log(apiUrl); // "https://api.example.com"
 ```
@@ -30,7 +30,7 @@ console.log(apiUrl); // "https://api.example.com"
 ```javascript
 // Bundle final
 const apiUrl = "https://api.example.com";
-const merchantId = "merchant-123";
+const orderId = "merchant-123";
 ```
 
 ### 2️⃣ Sistema Manual (Via `define`)
@@ -187,8 +187,8 @@ VITE_MERCHANT_ID=merchant-123
 ```typescript
 // src/components/Widget.tsx
 export function Widget() {
-  const merchantId = import.meta.env.VITE_MERCHANT_ID;
-  return <div>Merchant: {merchantId}</div>;
+  const orderId = import.meta.env.VITE_MERCHANT_ID;
+  return <div>Merchant: {orderId}</div>;
 }
 ```
 

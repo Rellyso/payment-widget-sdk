@@ -6,9 +6,9 @@
 
 ### Por Que Tokenizar?
 
-✅ **Segurança**: Dados do cartão nunca trafegam para seu backend  
-✅ **PCI DSS**: Reduz escopo de compliance (você não armazena dados de cartão)  
-✅ **Proteção**: Token inútil se interceptado (expira rapidamente)  
+✅ **Segurança**: Dados do cartão nunca trafegam para seu backend
+✅ **PCI DSS**: Reduz escopo de compliance (você não armazena dados de cartão)
+✅ **Proteção**: Token inútil se interceptado (expira rapidamente)
 ✅ **Reutilização**: Token pode ser usado para processar pagamento
 
 ---
@@ -623,7 +623,7 @@ export function PaymentFormStep({ config, onNext }: StepProps) {
 ```typescript
 // Frontend - Widget configurado
 window.PaymentWidget.init({
-  merchantId: "merchant-123",
+  orderId: "merchant-123",
   publicKey: "pk_live_xyz...", // ← Public Key (se usar Opção 2)
 
   onSuccess: async (data) => {
@@ -636,7 +636,7 @@ window.PaymentWidget.init({
       method: "POST",
       body: JSON.stringify({
         token: data.token,
-        merchantId: data.merchantId,
+        orderId: data.orderId,
         amount: 10000,
         installments: data.installments,
       }),

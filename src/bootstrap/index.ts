@@ -48,20 +48,18 @@ class PaymentWidgetBootstrap {
   async init(config: WidgetConfig): Promise<void> {
     try {
       // Valida configuração mínima
-      if (!config.merchantId) {
-        throw new Error("merchantId é obrigatório");
+      if (!config.orderId) {
+        throw new Error("orderId é obrigatório");
       }
 
-      // Verifica se já existe uma instância para este merchantId
-      if (this.state.instances.has(config.merchantId)) {
-        logger.warn(
-          `Widget já inicializado para merchantId: ${config.merchantId}`
-        );
+      // Verifica se já existe uma instância para este orderId
+      if (this.state.instances.has(config.orderId)) {
+        logger.warn(`Widget já inicializado para orderId: ${config.orderId}`);
         return;
       }
 
       // Cria container isolado
-      const container = this.createContainer(config.merchantId);
+      const container = this.createContainer(config.orderId);
 
       // Cria Shadow DOM (com fallback para iframe)
       const shadowRoot = this.createShadowDOM(container);
@@ -74,7 +72,7 @@ class PaymentWidgetBootstrap {
         api: null,
       };
 
-      this.state.instances.set(config.merchantId, instance);
+      this.state.instances.set(config.orderId, instance);
 
       // Carrega UI bundle assincronamente se necessário
       await this.loadUIBundle();
@@ -84,7 +82,7 @@ class PaymentWidgetBootstrap {
 
       // Auto-open se configurado
       if (config.autoOpen) {
-        this.open(config.merchantId);
+        this.open(config.orderId);
       }
 
       // Callback onOpen se definido
@@ -105,19 +103,17 @@ class PaymentWidgetBootstrap {
   /**
    * Abre o modal do widget
    */
-  open(merchantId?: string): void {
-    const targetMerchantId = merchantId || this.getFirstMerchantId();
+  open(orderId?: string): void {
+    const targetOrderId = orderId || this.getFirstOrderId();
 
-    if (!targetMerchantId) {
+    if (!targetOrderId) {
       logger.error("Nenhum widget inicializado");
       return;
     }
 
-    const instance = this.state.instances.get(targetMerchantId);
+    const instance = this.state.instances.get(targetOrderId);
     if (!instance?.api) {
-      logger.error(
-        `Widget não encontrado para merchantId: ${targetMerchantId}`
-      );
+      logger.error(`Widget não encontrado para orderId: ${targetOrderId}`);
       return;
     }
 
@@ -130,14 +126,14 @@ class PaymentWidgetBootstrap {
   /**
    * Fecha o modal do widget
    */
-  close(merchantId?: string): void {
-    const targetMerchantId = merchantId || this.getFirstMerchantId();
+  close(orderId?: string): void {
+    const targetOrderId = orderId || this.getFirstOrderId();
 
-    if (!targetMerchantId) {
+    if (!targetOrderId) {
       return;
     }
 
-    const instance = this.state.instances.get(targetMerchantId);
+    const instance = this.state.instances.get(targetOrderId);
     if (instance?.api) {
       instance.api.close();
 
@@ -149,14 +145,14 @@ class PaymentWidgetBootstrap {
   /**
    * Destroi uma instância do widget
    */
-  destroy(merchantId?: string): void {
-    const targetMerchantId = merchantId || this.getFirstMerchantId();
+  destroy(orderId?: string): void {
+    const targetOrderId = orderId || this.getFirstOrderId();
 
-    if (!targetMerchantId) {
+    if (!targetOrderId) {
       return;
     }
 
-    const instance = this.state.instances.get(targetMerchantId);
+    const instance = this.state.instances.get(targetOrderId);
     if (instance) {
       // Cleanup da instância
       if (instance.api?.destroy) {
@@ -169,15 +165,15 @@ class PaymentWidgetBootstrap {
       }
 
       // Remove da state
-      this.state.instances.delete(targetMerchantId);
+      this.state.instances.delete(targetOrderId);
     }
   }
 
   /**
    * Cria container isolado no DOM
    */
-  private createContainer(merchantId: string): HTMLElement {
-    const containerId = `${CONTAINER_ID_PREFIX}${merchantId}`;
+  private createContainer(orderId: string): HTMLElement {
+    const containerId = `${CONTAINER_ID_PREFIX}${orderId}`;
 
     // Verifica se já existe
     const existing = document.getElementById(containerId);
@@ -395,9 +391,9 @@ class PaymentWidgetBootstrap {
   }
 
   /**
-   * Obtém o primeiro merchantId disponível
+   * Obtém o primeiro orderId disponível
    */
-  private getFirstMerchantId(): string | undefined {
+  private getFirstOrderId(): string | undefined {
     return Array.from(this.state.instances.keys())[0];
   }
 
@@ -405,9 +401,9 @@ class PaymentWidgetBootstrap {
    * Obtém o estado público do widget
    */
   getState(): WidgetState {
-    const firstMerchantId = this.getFirstMerchantId();
-    const instance = firstMerchantId
-      ? this.state.instances.get(firstMerchantId)
+    const firstOrderId = this.getFirstOrderId();
+    const instance = firstOrderId
+      ? this.state.instances.get(firstOrderId)
       : null;
 
     // Obtém estado da API do widget
@@ -441,9 +437,9 @@ const bootstrap = new PaymentWidgetBootstrap();
 // API pública global
 window.PaymentWidget = {
   init: (config: WidgetConfig) => bootstrap.init(config),
-  open: (merchantId?: string) => bootstrap.open(merchantId),
-  close: (merchantId?: string) => bootstrap.close(merchantId),
-  destroy: (merchantId?: string) => bootstrap.destroy(merchantId),
+  open: (orderId?: string) => bootstrap.open(orderId),
+  close: (orderId?: string) => bootstrap.close(orderId),
+  destroy: (orderId?: string) => bootstrap.destroy(orderId),
   getState: () => bootstrap.getState(),
 };
 
@@ -453,7 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentScript = document.currentScript as HTMLScriptElement;
   if (currentScript) {
     const config = extractConfigFromDataAttributes(currentScript);
-    if (config.merchantId) {
+    if (config.orderId) {
       bootstrap.init(config);
     }
   }
@@ -473,7 +469,7 @@ function extractConfigFromDataAttributes(
   const dataset = script.dataset;
 
   return {
-    merchantId: dataset.merchantId || "",
+    orderId: dataset.orderId || "",
     theme: {
       primaryColor: dataset.primary || dataset.primaryColor,
       secondaryColor: dataset.secondary || dataset.secondaryColor,

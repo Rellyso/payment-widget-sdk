@@ -2,14 +2,18 @@
 import { useState } from "react";
 import type { WidgetConfig, WidgetState, WidgetStep } from "../types";
 import { WIDGET_STEPS } from "../types";
-import { PaymentModal } from "./PaymentModal";
-import { AddressFormStep } from "./steps/AddressFormStep";
-import { AnalysisResultStep } from "./steps/AnalysisResultStep";
-import { AuthorizationStep } from "./steps/AuthorizationStep";
-import { ConfirmationStep } from "./steps/ConfirmationStep";
-import { CreditAnalysisStep } from "./steps/CreditAnalysisStep";
-import { PaymentFormStep } from "./steps/PaymentFormStep";
-import { ThemeProvider } from "./ThemeProvider";
+import { PaymentModal } from "./payment-modal";
+import { AddressFormStep } from "./steps/address-form-step";
+import { AnalysisResultStep } from "./steps/analysis-result-step";
+import { AuthorizationStep } from "./steps/authorization-step";
+import { ConfirmationStep } from "./steps/confirmation-step";
+import { CreditAnalysisStep } from "./steps/credit-analysis-step";
+import { IdentityValidationResultStep } from "./steps/identity-validation-result-step";
+import { PaymentFormStep } from "./steps/payment-form-step";
+import { QRCodeIdentityValidation } from "./steps/qr-code-identity-validation-step";
+import { TokenResultStep } from "./steps/token-result-step";
+import { TokenValidationStep } from "./steps/token-validation-step";
+import { ThemeProvider } from "./theme-provider";
 
 type PaymentWidgetProps = {
   config: WidgetConfig;
@@ -19,7 +23,7 @@ type PaymentWidgetProps = {
 export function PaymentWidget({ config, initialState }: PaymentWidgetProps) {
   const [internalState, setInternalState] = useState<WidgetState>(() => ({
     isOpen: false,
-    currentStep: WIDGET_STEPS.AUTHORIZATION,
+    currentStep: WIDGET_STEPS.CREDIT_ANALYSIS,
     isLoading: false,
     isLoaded: false,
     ...initialState,
@@ -84,14 +88,22 @@ export function PaymentWidget({ config, initialState }: PaymentWidgetProps) {
     };
 
     switch (state.currentStep) {
-      case WIDGET_STEPS.AUTHORIZATION:
-        return <AuthorizationStep {...stepProps} />;
       case WIDGET_STEPS.CREDIT_ANALYSIS:
         return <CreditAnalysisStep {...stepProps} />;
+      case WIDGET_STEPS.TOKEN_VALIDATION:
+        return <TokenValidationStep {...stepProps} />;
+      case WIDGET_STEPS.TOKEN_RESULT:
+        return <TokenResultStep {...stepProps} />;
+      case WIDGET_STEPS.AUTHORIZATION:
+        return <AuthorizationStep {...stepProps} />;
       case WIDGET_STEPS.ANALYSIS_RESULT:
         return <AnalysisResultStep {...stepProps} />;
       case WIDGET_STEPS.ADDRESS_FORM:
         return <AddressFormStep {...stepProps} />;
+      case WIDGET_STEPS.QR_CODE_IDENTITY_VALIDATION:
+        return <QRCodeIdentityValidation {...stepProps} />;
+      case WIDGET_STEPS.IDENTITY_VALIDATION_RESULT:
+        return <IdentityValidationResultStep {...stepProps} />;
       case WIDGET_STEPS.PAYMENT_FORM:
         return <PaymentFormStep {...stepProps} />;
       case WIDGET_STEPS.CONFIRMATION:
@@ -124,15 +136,10 @@ export function PaymentWidget({ config, initialState }: PaymentWidgetProps) {
           onClose={handleClose}
           title="Cartão Simples"
         >
-          <div className="p-6">
-            {/* Indicador de progresso */}
-            {/* <StepNavigation
-            currentStep={state.currentStep}
-            steps={Object.values(WIDGET_STEPS)}
-          /> */}
+          <div className="p-6 pt-4">
 
             {/* Conteúdo do step atual */}
-            <div className="mt-6">{renderCurrentStep()}</div>
+            <div>{renderCurrentStep()}</div>
           </div>
         </PaymentModal>
 
@@ -140,8 +147,8 @@ export function PaymentWidget({ config, initialState }: PaymentWidgetProps) {
         {typeof window !== "undefined" && (
           <div
             ref={(el) => {
-              if (el && config.merchantId) {
-                (window as any)[`PaymentWidget_${config.merchantId}`] = api;
+              if (el && config.orderId) {
+                (window as any)[`PaymentWidget_${config.orderId}`] = api;
               }
             }}
           />
@@ -180,10 +187,10 @@ export const mount = (container: HTMLElement, config: WidgetConfig) => {
   root.render(React.createElement(PaymentWidget, { config }));
 
   // Função helper para aguardar a API global estar disponível
-  const waitForApi = (merchantId: string): Promise<any> => {
+  const waitForApi = (orderId: string): Promise<any> => {
     return new Promise((resolve) => {
       const checkApi = () => {
-        const globalApi = (window as any)[`PaymentWidget_${merchantId}`];
+        const globalApi = (window as any)[`PaymentWidget_${orderId}`];
         if (globalApi) {
           resolve(globalApi);
         } else {
@@ -196,21 +203,21 @@ export const mount = (container: HTMLElement, config: WidgetConfig) => {
 
   return {
     open: async () => {
-      if (config.merchantId) {
-        const api = await waitForApi(config.merchantId);
+      if (config.orderId) {
+        const api = await waitForApi(config.orderId);
         api.open();
       }
     },
     close: async () => {
-      if (config.merchantId) {
-        const api = await waitForApi(config.merchantId);
+      if (config.orderId) {
+        const api = await waitForApi(config.orderId);
         api.close();
       }
     },
     destroy: () => {
       // Remove API global se existir
-      if (config.merchantId) {
-        delete (window as any)[`PaymentWidget_${config.merchantId}`];
+      if (config.orderId) {
+        delete (window as any)[`PaymentWidget_${config.orderId}`];
       }
       root.unmount();
     },

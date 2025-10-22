@@ -9,32 +9,32 @@ const MAX_NEIGHBORHOOD_LENGTH = 100;
 const MAX_CITY_LENGTH = 100;
 const MAX_CARDHOLDER_NAME_LENGTH = 50;
 const MAX_NUMBER_LENGTH = 10;
-const MAX_INCOME = 1_000_000;
 const MAX_INSTALLMENTS = 12;
 const MIN_AGE = 18;
-const CPF_LENGTH = 11;
-const CPF_FIRST_DIGIT_MULTIPLIER = 10;
-const CPF_SECOND_DIGIT_MULTIPLIER = 11;
 const CPF_DIGIT_COUNT_FIRST = 9;
-const CPF_DIGIT_COUNT_SECOND = 10;
 const DECIMAL_BASE = 10;
+const MIN_PASSWORD_LENGTH = 8;
+const PHONE_CODE_LENGTH = 6;
 
 // Validações customizadas - Regex definidos no escopo superior
-const CPF_REGEX = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
 const PHONE_REGEX = /^\(\d{2}\) \d{4,5}-\d{4}$/;
 const CEP_REGEX = /^\d{5}-\d{3}$/;
 const CARD_NUMBER_REGEX = /^\d{4} \d{4} \d{4} \d{4}$/;
-const EXPIRY_DATE_REGEX = /^(0[1-9]|1[0-2])\/\d{2}$/;
+const EXPIRY_DATE_REGEX = /^(0[1-9]|1[0-2])\/\d{4}$/;
 const CVV_REGEX = /^\d{3,4}$/;
-const REPEATED_DIGITS_REGEX = /^(\d)\1{10}$/;
 const LETTERS_ONLY_REGEX = /^[a-zA-ZÀ-ÿ\s]+$/;
 const STATE_REGEX = /^[A-Z]{2}$/;
 const DATE_FORMAT_REGEX = /^\d{2}\/\d{2}\/\d{4}$/;
 const PIXEL_VALUE_REGEX = /^\d+px$/;
+const PASSWORD_UPPERCASE_REGEX = /[A-Z]/;
+const PASSWORD_LOWERCASE_REGEX = /[a-z]/;
+const PASSWORD_NUMBER_REGEX = /[0-9]/;
+const PASSWORD_SPECIAL_CHAR_REGEX = /[^a-zA-Z0-9]/;
+const PASSWORD_NO_SPACES_REGEX = /^[^\s]+$/;
 
 // Schema de configuração do widget
 export const widgetConfigSchema = z.object({
-  merchantId: z.string().min(1, "Merchant ID é obrigatório"),
+  orderId: z.string().min(1, "Order ID é obrigatório"),
   primaryColor: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, "Cor primária deve ser um hex válido")
@@ -65,32 +65,54 @@ export const widgetConfigSchema = z.object({
 });
 
 // Schema para análise de crédito
-export const creditAnalysisSchema = z.object({
-  cpf: z
-    .string()
-    .regex(CPF_REGEX, "CPF deve estar no formato 000.000.000-00")
-    .refine(validateCPF, "CPF inválido"),
-  fullName: z
-    .string()
-    .min(2, "Nome deve ter pelo menos 2 caracteres")
-    .max(MAX_NAME_LENGTH, "Nome deve ter no máximo 100 caracteres")
-    .regex(LETTERS_ONLY_REGEX, "Nome deve conter apenas letras e espaços"),
-  phone: z
-    .string()
-    .regex(PHONE_REGEX, "Telefone deve estar no formato (00) 00000-0000"),
-  birthDate: z
-    .string()
-    .regex(DATE_FORMAT_REGEX, "Data deve estar no formato DD/MM/AAAA")
-    .refine(validateAge, "Você deve ter pelo menos 18 anos"),
-  monthlyIncome: z
-    .number()
-    .min(0, "Renda deve ser positiva")
-    .max(MAX_INCOME, "Valor muito alto para renda mensal"),
-  email: z
-    .string()
-    .email("Email deve ser válido")
-    .max(MAX_EMAIL_LENGTH, "Email deve ter no máximo 100 caracteres"),
-});
+export const creditAnalysisSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, { message: "O nome deve ter pelo menos 2 caracteres" })
+      .regex(LETTERS_ONLY_REGEX, {
+        message: "O nome deve conter apenas letras e espaços",
+      }),
+    lastName: z
+      .string()
+      .min(2, { message: "O sobrenome deve ter pelo menos 2 caracteres" })
+      .regex(LETTERS_ONLY_REGEX, {
+        message: "O sobrenome deve conter apenas letras e espaços",
+      }),
+    phone: z
+      .string()
+      .regex(PHONE_REGEX, "Telefone deve estar no formato (00) 00000-0000"),
+    birthDate: z
+      .string()
+      .regex(DATE_FORMAT_REGEX, "Data deve estar no formato DD/MM/AAAA")
+      .refine(validateAge, "Você deve ter pelo menos 18 anos"),
+    email: z
+      .string()
+      .email("Email deve ser válido")
+      .max(MAX_EMAIL_LENGTH, "Email deve ter no máximo 100 caracteres"),
+    password: z
+      .string()
+      .min(MIN_PASSWORD_LENGTH, "No mínimo 8 caracteres")
+      .regex(
+        PASSWORD_UPPERCASE_REGEX,
+        "Deve conter pelo menos uma letra maiúscula"
+      )
+      .regex(
+        PASSWORD_LOWERCASE_REGEX,
+        "Deve conter pelo menos uma letra minúscula"
+      )
+      .regex(PASSWORD_NUMBER_REGEX, "Deve conter pelo menos um número")
+      .regex(PASSWORD_NO_SPACES_REGEX, "Não deve conter espaços")
+      .regex(
+        PASSWORD_SPECIAL_CHAR_REGEX,
+        "Deve conter ao menos um caractere especial"
+      ),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não são iguais, tente novamente",
+    path: ["confirmPassword"],
+  });
 
 // Schema para endereço
 export const addressSchema = z.object({
@@ -140,7 +162,7 @@ export const paymentSchema = z.object({
     .regex(LETTERS_ONLY_REGEX, "Nome deve conter apenas letras e espaços"),
   expiryDate: z
     .string()
-    .regex(EXPIRY_DATE_REGEX, "Data deve estar no formato MM/AA")
+    .regex(EXPIRY_DATE_REGEX, "Data deve estar no formato mm/aaaa")
     .refine(validateExpiryDate, "Data de expiração inválida ou vencida"),
   cvv: z.string().regex(CVV_REGEX, "CVV deve ter 3 ou 4 dígitos"),
   installments: z
@@ -150,50 +172,15 @@ export const paymentSchema = z.object({
     .max(MAX_INSTALLMENTS, "Número máximo de parcelas é 12"),
 });
 
+export const phoneCodeSchema = z.object({
+  phoneCode: z
+    .string({
+      message: "Informe o código recebido via SMS",
+    })
+    .length(PHONE_CODE_LENGTH, "O código deve ter 6 dígitos"),
+});
+
 // Funções de validação customizadas
-function validateCPF(cpf: string): boolean {
-  // Remove formatação
-  const cleanCPF = cpf.replace(/[.-]/g, "");
-
-  // Verifica se tem 11 dígitos
-  if (cleanCPF.length !== CPF_LENGTH) {
-    return false;
-  }
-
-  // Verifica se todos os dígitos são iguais
-  if (REPEATED_DIGITS_REGEX.test(cleanCPF)) {
-    return false;
-  }
-
-  // Calcula primeiro dígito verificador
-  let sum = 0;
-  for (let i = 0; i < CPF_DIGIT_COUNT_FIRST; i++) {
-    sum +=
-      Number.parseInt(cleanCPF.charAt(i), DECIMAL_BASE) *
-      (CPF_FIRST_DIGIT_MULTIPLIER - i);
-  }
-  let remainder =
-    CPF_SECOND_DIGIT_MULTIPLIER - (sum % CPF_SECOND_DIGIT_MULTIPLIER);
-  const digit1 = remainder < 2 ? 0 : remainder;
-
-  // Calcula segundo dígito verificador
-  sum = 0;
-  for (let i = 0; i < CPF_DIGIT_COUNT_SECOND; i++) {
-    sum +=
-      Number.parseInt(cleanCPF.charAt(i), DECIMAL_BASE) *
-      (CPF_SECOND_DIGIT_MULTIPLIER - i);
-  }
-  remainder = CPF_SECOND_DIGIT_MULTIPLIER - (sum % CPF_SECOND_DIGIT_MULTIPLIER);
-  const digit2 = remainder < 2 ? 0 : remainder;
-
-  return (
-    digit1 ===
-      Number.parseInt(cleanCPF.charAt(CPF_DIGIT_COUNT_FIRST), DECIMAL_BASE) &&
-    digit2 ===
-      Number.parseInt(cleanCPF.charAt(CPF_DIGIT_COUNT_SECOND), DECIMAL_BASE)
-  );
-}
-
 function validateAge(dateString: string): boolean {
   const [day, month, year] = dateString.split("/").map(Number);
   const birthDate = new Date(year, month - 1, day);
@@ -243,7 +230,7 @@ function validateCardNumber(cardNumber: string): boolean {
 function validateExpiryDate(dateString: string): boolean {
   const [month, year] = dateString.split("/").map(Number);
   const currentDate = new Date();
-  const currentYear = currentDate.getFullYear() % MAX_NAME_LENGTH;
+  const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
 
   const MIN_MONTH = 1;
@@ -265,3 +252,4 @@ function validateExpiryDate(dateString: string): boolean {
 export type CreditAnalysisFormData = z.infer<typeof creditAnalysisSchema>;
 export type AddressFormData = z.infer<typeof addressSchema>;
 export type PaymentFormData = z.infer<typeof paymentSchema>;
+export type PhoneCodeFormData = z.infer<typeof phoneCodeSchema>;

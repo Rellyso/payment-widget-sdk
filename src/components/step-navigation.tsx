@@ -10,8 +10,10 @@ type StepNavigationProps = {
 const stepLabels: Record<WidgetStep, string> = {
   [WIDGET_STEPS.AUTHORIZATION]: "Autorização",
   [WIDGET_STEPS.CREDIT_ANALYSIS]: "Análise",
-  [WIDGET_STEPS.ANALYSIS_RESULT]: "Resultado",
+  [WIDGET_STEPS.ANALYSIS_RESULT]: "Resultado análise de crédito",
   [WIDGET_STEPS.ADDRESS_FORM]: "Endereço",
+  [WIDGET_STEPS.IDENTITY_VALIDATION_RESULT]:
+    "Resultado validação de identidade",
   [WIDGET_STEPS.PAYMENT_FORM]: "Pagamento",
   [WIDGET_STEPS.CONFIRMATION]: "Confirmação",
 };

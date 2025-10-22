@@ -1,6 +1,15 @@
-<!-- 
-Exemplo de integração do Cartão Simples Widget com Vue.js 3
-Usando Composition API
+<!--
+Exemplo
+de;
+integração;
+do Cartão Simples
+Widget;
+com;
+Vue.js;
+3;
+Usando;
+Composition;
+API;
 -->
 
 <template>
@@ -9,8 +18,8 @@ Usando Composition API
       <h2>iPhone 15 Pro</h2>
       <p class="price">R$ 8.999,00</p>
       <p class="installments">ou até 12x de R$ 749,92 sem juros</p>
-      
-      <button 
+
+      <button
         @click="openPaymentWidget"
         :disabled="loading"
         class="payment-button"
@@ -21,7 +30,7 @@ Usando Composition API
     </div>
 
     <!-- Widget será montado aqui via Shadow DOM -->
-    <div ref="widgetContainer" id="cartao-simples-widget"></div>
+    <div id="cartao-simples-widget" ref="widgetContainer" />
   </div>
 </template>
 
@@ -36,8 +45,8 @@ let widgetInstance = null
 
 // Configuração do widget
 const widgetConfig = {
-  merchantId: import.meta.env.VITE_CARTAO_SIMPLES_MERCHANT_ID,
-  primaryColor: '#FF6600',
+  orderId: import.meta.env.VITE_CARTAO_SIMPLES_MERCHANT_ID,
+  primaryColor: '#3a36f5',
   secondaryColor: '#0A0A0A',
   logoUrl: '/logo.png',
   environment: import.meta.env.VITE_APP_ENV === 'production' ? 'production' : 'staging',
@@ -65,10 +74,10 @@ const loadWidget = () => {
 const openPaymentWidget = async () => {
   try {
     loading.value = true
-    
+
     // Carregar widget se ainda não estiver carregado
     await loadWidget()
-    
+
     // Inicializar widget
     widgetInstance = window.PaymentWidget.init({
       ...widgetConfig,
@@ -77,10 +86,10 @@ const openPaymentWidget = async () => {
       onOpen: handleWidgetOpen,
       onClose: handleWidgetClose
     })
-    
+
     // Abrir widget
     widgetInstance.open()
-    
+
   } catch (error) {
     console.error('Erro ao carregar widget:', error)
     handlePaymentError({ message: 'Erro ao carregar widget de pagamento' })
@@ -91,7 +100,7 @@ const openPaymentWidget = async () => {
 
 const handlePaymentSuccess = (data) => {
   console.log('Pagamento realizado com sucesso:', data)
-  
+
   // Redirecionar para página de sucesso
   router.push({
     name: 'PaymentSuccess',
@@ -105,11 +114,11 @@ const handlePaymentSuccess = (data) => {
 
 const handlePaymentError = (error) => {
   console.error('Erro no pagamento:', error)
-  
+
   // Mostrar notificação de erro
   // Aqui você pode usar sua biblioteca de notificações favorita
   alert(`Erro: ${error.message}`)
-  
+
   // Ou redirecionar para página de erro
   router.push({
     name: 'PaymentError',
@@ -235,11 +244,11 @@ onMounted(async () => {
   .payment-integration {
     padding: 16px;
   }
-  
+
   .product-card {
     padding: 20px;
   }
-  
+
   .payment-button {
     font-size: 14px;
     padding: 14px 20px;

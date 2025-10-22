@@ -1,18 +1,29 @@
 import clsx from "clsx";
 import type { InputHTMLAttributes } from "react";
 import { forwardRef, useState } from "react";
-import { applyMask, masks } from "../utils/masks";
+import { applyMask, masks } from "../../utils/masks";
+import { PasswordToggler } from "./password-toggler";
+import { useTheme } from "../theme-provider";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   error?: string;
   mask?: keyof typeof masks;
   icon?: React.ReactNode;
+  disabled?: boolean;
 };
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, mask, icon, className, onChange, ...props }, ref) => {
+  (
+    { label, error, mask, icon, className, onChange, type = "text", ...props },
+    ref
+  ) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const theme = useTheme();
+
+    const isPassword = type === "password";
+    const inputType = isPassword && isPasswordVisible ? "text" : type;
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       let value = event.target.value;
@@ -39,15 +50,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="space-y-1">
         <label
-          className={clsx("font-medium text-sm transition-colors", {
+          className={clsx("text-sm transition-colors", {
             "text-primary": isFocused,
             "text-red-600": error,
-            "text-gray-700": !(isFocused || error),
+            "text-black-002": !(isFocused || error),
           })}
           htmlFor={props.id || props.name}
         >
           {label}
-          {props.required && <span className="ml-1 text-red-500">*</span>}
         </label>
 
         <div className="relative">
@@ -61,19 +71,33 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             {...props}
             className={clsx(
-              "w-full rounded-lg border px-3 py-2 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary",
+              "w-full border border-white-003 bg-white-001 p-4 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:bg-white-003 disabled:text-black-002/50",
               {
                 "pl-10": icon,
                 "border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500":
                   error,
-                "border-gray-300 text-gray-900 placeholder-gray-500": !error,
+                "border-gray-300 text-gray-900 placeholder-black-002/50":
+                  !error,
               },
               className
             )}
+            style={{
+              borderRadius: theme?.borderRadius || "8px",
+              ...props.style,
+            }}
             onBlur={handleBlur}
             onChange={handleChange}
             onFocus={handleFocus}
+            type={inputType}
           />
+          {isPassword && (
+            <PasswordToggler
+              isPasswordVisible={isPasswordVisible}
+              togglePasswordVisibility={() =>
+                setIsPasswordVisible((prev) => !prev)
+              }
+            />
+          )}
         </div>
 
         {error && (

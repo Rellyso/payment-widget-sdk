@@ -31,7 +31,7 @@ O **bootstrap** é um script leve (~5KB) que gerencia o carregamento dinâmico d
     <script>
       // Após o bootstrap carregar
       window.PaymentWidget.init({
-        merchantId: "seu-merchant-id",
+        orderId: "seu-merchant-id",
         primaryColor: "#667eea",
         environment: "production",
         autoOpen: false,
@@ -81,7 +81,7 @@ O **bundle CDN** inclui React e toda a UI (~400KB).
       const container = document.getElementById("widget-root");
 
       const widgetInstance = window.CartaoSimplesWidget.mount(container, {
-        merchantId: "seu-merchant-id",
+        orderId: "seu-merchant-id",
         primaryColor: "#667eea",
         environment: "production",
         onClose: () => console.log("Widget fechado"),
@@ -111,7 +111,7 @@ O **bundle CDN** inclui React e toda a UI (~400KB).
 ```typescript
 interface WidgetConfig {
   // Obrigatório
-  merchantId: string; // ID do merchant
+  orderId: string; // ID do merchant
 
   // Aparência (opcional)
   primaryColor?: string; // Cor primária (ex: "#667eea")
@@ -156,7 +156,7 @@ interface WidgetConfig {
 <script>
   document.getElementById("checkout-btn").addEventListener("click", () => {
     window.PaymentWidget.init({
-      merchantId: "merchant-123",
+      orderId: "merchant-123",
       autoOpen: true,
       onSuccess: (data) => {
         alert("Pagamento realizado com sucesso!");
@@ -177,7 +177,7 @@ interface WidgetConfig {
   const container = document.getElementById("widget-inline");
 
   window.CartaoSimplesWidget.mount(container, {
-    merchantId: "merchant-123",
+    orderId: "merchant-123",
     primaryColor: "#10b981",
   });
 </script>
@@ -189,7 +189,7 @@ interface WidgetConfig {
 <script src="https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js"></script>
 <script>
   window.PaymentWidget.init({
-    merchantId: "merchant-123",
+    orderId: "merchant-123",
 
     // Branding
     primaryColor: "#8b5cf6",
@@ -290,7 +290,7 @@ if (!window.CartaoSimplesWidget) {
 ```javascript
 // Adicione callbacks para debug
 window.PaymentWidget.init({
-  merchantId: "test",
+  orderId: "test",
   onOpen: () => console.log("✅ Abriu"),
   onClose: () => console.log("ℹ️ Fechou"),
   onError: (err) => console.error("❌ Erro:", err),

@@ -430,9 +430,9 @@ Used when loading via `widget-bootstrap.v1.min.js`:
 
 ```typescript
 window.PaymentWidget.init(config: WidgetConfig): Promise<void>
-window.PaymentWidget.open(merchantId?: string): void
-window.PaymentWidget.close(merchantId?: string): void
-window.PaymentWidget.destroy(merchantId?: string): void
+window.PaymentWidget.open(orderId?: string): void
+window.PaymentWidget.close(orderId?: string): void
+window.PaymentWidget.destroy(orderId?: string): void
 window.PaymentWidget.getState(): { isLoaded: boolean }
 ```
 
@@ -489,22 +489,22 @@ Always test via HTTP server (not `file://`) due to CORS restrictions.
 
 ### Issue: "ERR_NAME_NOT_RESOLVED" on widget load
 
-**Cause**: Bootstrap has wrong CDN_BASE_URL  
+**Cause**: Bootstrap has wrong CDN_BASE_URL
 **Solution**: Update `src/bootstrap/index.ts` with correct CloudFront URL, rebuild, and redeploy
 
 ### Issue: CORS errors in browser
 
-**Cause**: S3 bucket missing CORS configuration  
+**Cause**: S3 bucket missing CORS configuration
 **Solution**: Run `./deploy.sh` which configures CORS automatically, or manually apply CORS config
 
 ### Issue: Old files served after deploy
 
-**Cause**: CloudFront cache not invalidated  
+**Cause**: CloudFront cache not invalidated
 **Solution**: Script invalidates automatically. If manual: `aws cloudfront create-invalidation --distribution-id EOLJNTE5PW5O9 --paths "/*"`
 
 ### Issue: Widget not found in window object
 
-**Cause**: Using wrong API for the loaded script  
+**Cause**: Using wrong API for the loaded script
 **Solution**:
 
 - Bootstrap loader → `window.PaymentWidget`

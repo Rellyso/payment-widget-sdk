@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "./theme-provider";
 
 const FOCUS_DELAY_MS = 100;
 
@@ -138,7 +138,7 @@ export function PaymentModal({
           <motion.div
             animate={{ opacity: 1 }}
             aria-hidden="true"
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/65"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
             onClick={onClose}
@@ -159,7 +159,7 @@ export function PaymentModal({
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-gray-100 p-6">
+            <div className="flex items-center justify-between border-gray-100 p-6 pb-0">
               {theme.logoUrl ? (
                 <picture>
                   <source srcSet={theme.logoUrl} />

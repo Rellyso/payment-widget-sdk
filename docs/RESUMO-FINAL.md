@@ -132,7 +132,7 @@ curl -I https://d2x7cg3k3on9lk.cloudfront.net/widget.v1.min.css
 ></script>
 <script>
   window.PaymentWidget.init({
-    merchantId: "seu-merchant-id",
+    orderId: "seu-merchant-id",
     theme: {
       primaryColor: "#2196F3",
       secondaryColor: "#4CAF50",

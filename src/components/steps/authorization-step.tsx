@@ -3,22 +3,22 @@ import { WIDGET_STEPS } from "../../types";
 import { Button } from "../ui/button";
 import type { StepProps } from "./types";
 
-export function AuthorizationStep({ onNext, config }: StepProps) {
+export function AuthorizationStep({ onNext }: StepProps) {
   const [isAccepted, setIsAccepted] = useState(false);
 
   const handleContinue = () => {
     if (isAccepted) {
-      onNext(WIDGET_STEPS.CREDIT_ANALYSIS);
+      onNext(WIDGET_STEPS.ANALYSIS_RESULT);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="">
-        <h3 className="mb-2 font-semibold text-gray-900 text-lg">
+        <h3 className="mb-2 font-bold text-black-001 text-xl leading-5">
           Tudo pronto para a análise?
         </h3>
-        <p className="text-gray-600 text-sm">
+        <p className="text-black-002 text-sm leading-5">
           Ao autorizar, o Cartão Simples utilizará seus dados apenas para a
           análise de crédito.
         </p>
@@ -37,19 +37,25 @@ export function AuthorizationStep({ onNext, config }: StepProps) {
             />
           </div>
           <div className="ml-3 text-sm">
-            <label
-              className="font-medium text-gray-700"
-              htmlFor="accept-analysis"
-            >
-              Li e concordo com a Política de Privacidade do Cartão Simples
+            <label className="text-black-002" htmlFor="accept-analysis">
+              Li e concordo com os{" "}
+              <a href="https://www.cartaosimples.com.br/cliente/termos-de-uso">
+                Termos de uso
+              </a>{" "}
+              do Cartão Simples
             </label>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <Button disabled={!isAccepted} onClick={handleContinue} type="button">
-          Autorizar análise de crédito
+      <div className="flex">
+        <Button
+          className="w-full"
+          disabled={!isAccepted}
+          onClick={handleContinue}
+          type="button"
+        >
+          Continuar
         </Button>
       </div>
     </div>

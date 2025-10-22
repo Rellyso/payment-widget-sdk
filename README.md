@@ -42,7 +42,7 @@ Ou usando configuração via JavaScript:
 ></script>
 <script>
   window.PaymentWidgetInit = {
-    merchantId: "seu-merchant-123",
+    orderId: "seu-merchant-123",
     primaryColor: "#FF6600",
     logoUrl: "https://seusite.com/logo.png",
     apiBaseUrl: "https://api.cartaosimples.com",
@@ -71,7 +71,7 @@ function App() {
   return (
     <PaymentWidget
       config={{
-        merchantId: "seu-merchant-123",
+        orderId: "seu-merchant-123",
         primaryColor: "#FF6600",
         onSuccess: (data) => console.log("Sucesso:", data),
         onError: (error) => console.error("Erro:", error),
@@ -87,7 +87,7 @@ function App() {
 import { mount } from "cartao-simples-widget";
 
 const widget = mount(document.getElementById("widget-container"), {
-  merchantId: "seu-merchant-123",
+  orderId: "seu-merchant-123",
   primaryColor: "#FF6600",
   onSuccess: (data) => console.log("Sucesso:", data),
 });
@@ -102,7 +102,7 @@ widget.close();
 ```javascript
 // Via CDN
 window.PaymentWidget.init({
-  merchantId: "merchant-123",
+  orderId: "merchant-123",
   autoOpen: false,
 });
 
@@ -117,7 +117,7 @@ window.PaymentWidget.destroy();
 
 | Propriedade      | Tipo      | Padrão    | Descrição                              |
 | ---------------- | --------- | --------- | -------------------------------------- |
-| `merchantId`     | `string`  | -         | **Obrigatório** - ID único do parceiro |
+| `orderId`     | `string`  | -         | **Obrigatório** - ID único do parceiro |
 | `primaryColor`   | `string`  | `#ff6600` | Cor primária (hex)                     |
 | `secondaryColor` | `string`  | `#0a0a0a` | Cor secundária (hex)                   |
 | `logoUrl`        | `string`  | -         | URL do logo do parceiro                |
@@ -143,7 +143,7 @@ window.PaymentWidget.destroy();
 {
   transactionId: "txn_123456789",
   token: "tok_abcdef123",
-  merchantId: "merchant_001",
+  orderId: "merchant_001",
   amount?: 1500.00,
   installments?: 12,
   timestamp: "2024-01-15T10:30:00Z"
@@ -291,7 +291,7 @@ https://cdn.cartaosimples.com/widget.v1.min.js           (122KB)
     <script>
       document.getElementById("payment-btn").addEventListener("click", () => {
         window.PaymentWidget.init({
-          merchantId: "loja-123",
+          orderId: "loja-123",
           primaryColor: "#FF6600",
           onSuccess: (data) => {
             // Redirecionar para página de sucesso
@@ -336,7 +336,7 @@ export default function CheckoutPage() {
 
       <PaymentWidget
         config={{
-          merchantId: process.env.NEXT_PUBLIC_MERCHANT_ID!,
+          orderId: process.env.NEXT_PUBLIC_MERCHANT_ID!,
           primaryColor: "#FF6600",
           onSuccess: (data) => {
             // Processar pagamento
@@ -397,7 +397,7 @@ O script `setup-cloudfront.sh` automaticamente:
 
 **❌ Widget não aparece**
 
-- Verificar se o `merchantId` está correto
+- Verificar se o `orderId` está correto
 - Conferir console por erros de CORS
 - Verificar se o script carregou (`window.PaymentWidget` existe)
 

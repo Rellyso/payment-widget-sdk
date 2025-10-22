@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PaymentWidget } from "./components/PaymentWidget";
+import { PaymentWidget } from "./components/payment-widget";
 import type { WidgetConfig } from "./types";
 import "./styles/widget.css";
 
@@ -7,11 +7,11 @@ function App() {
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
   const widgetConfig: WidgetConfig = {
-    merchantId: "demo-merchant-123",
+    orderId: "demo-merchant-123",
     theme: {
-      primaryColor: "#ff6600",
+      primaryColor: "#3a36f5",
       secondaryColor: "#0a0a0a",
-      borderRadius: "md",
+      borderRadius: "12px",
     },
     logoUrl: "https://www.cartaosimples.com.br/logo-extendida.svg",
     environment: "staging",

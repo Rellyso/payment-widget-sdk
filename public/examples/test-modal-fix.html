@@ -1,257 +1,298 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Teste Modal - Payment Widget</title>
+        <style>
+            body {
+                font-family: system-ui, sans-serif;
+                max-width: 800px;
+                margin: 50px auto;
+                padding: 20px;
+                background: #f5f5f5;
+            }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teste Modal - Payment Widget</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      max-width: 800px;
-      margin: 50px auto;
-      padding: 20px;
-      background: #f5f5f5;
-    }
+            .card {
+                background: white;
+                border-radius: 8px;
+                padding: 30px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
 
-    .card {
-      background: white;
-      border-radius: 8px;
-      padding: 30px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+            h1 {
+                color: #333;
+                margin-bottom: 20px;
+            }
 
-    h1 {
-      color: #333;
-      margin-bottom: 20px;
-    }
+            button {
+                background: #2196f3;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
 
-    button {
-      background: #2196F3;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-right: 10px;
-      margin-bottom: 10px;
-    }
+            button:hover {
+                background: #1976d2;
+            }
 
-    button:hover {
-      background: #1976D2;
-    }
+            button:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+            }
 
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
+            .log {
+                background: #263238;
+                color: #aed581;
+                padding: 15px;
+                border-radius: 4px;
+                max-height: 300px;
+                overflow-y: auto;
+                font-family: "Courier New", monospace;
+                font-size: 13px;
+                margin-top: 20px;
+            }
 
-    .log {
-      background: #263238;
-      color: #aed581;
-      padding: 15px;
-      border-radius: 4px;
-      max-height: 300px;
-      overflow-y: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      margin-top: 20px;
-    }
+            .log-entry {
+                margin: 5px 0;
+            }
 
-    .log-entry {
-      margin: 5px 0;
-    }
+            .log-entry.success {
+                color: #81c784;
+            }
 
-    .log-entry.success {
-      color: #81C784;
-    }
+            .log-entry.error {
+                color: #e57373;
+            }
 
-    .log-entry.error {
-      color: #E57373;
-    }
+            .log-entry.warning {
+                color: #ffb74d;
+            }
 
-    .log-entry.warning {
-      color: #FFB74D;
-    }
+            .log-entry.info {
+                color: #64b5f6;
+            }
+        </style>
+    </head>
 
-    .log-entry.info {
-      color: #64B5F6;
-    }
-  </style>
-</head>
+    <body>
+        <div class="card">
+            <h1>🧪 Teste de Abertura do Modal</h1>
+            <p>
+                Este teste verifica se o modal abre corretamente após as
+                correções no bootstrap.
+            </p>
 
-<body>
-  <div class="card">
-    <h1>🧪 Teste de Abertura do Modal</h1>
-    <p>Este teste verifica se o modal abre corretamente após as correções no bootstrap.</p>
+            <div style="margin: 20px 0">
+                <button id="btn-init" onclick="initWidget()">
+                    1. Inicializar Widget
+                </button>
+                <button id="btn-open" onclick="openWidget()" disabled>
+                    2. Abrir Modal
+                </button>
+                <button id="btn-close" onclick="closeWidget()" disabled>
+                    3. Fechar Modal
+                </button>
+                <button id="btn-inspect" onclick="inspectContainer()" disabled>
+                    4. Inspecionar Container
+                </button>
+            </div>
 
-    <div style="margin: 20px 0;">
-      <button id="btn-init" onclick="initWidget()">1. Inicializar Widget</button>
-      <button id="btn-open" onclick="openWidget()" disabled>2. Abrir Modal</button>
-      <button id="btn-close" onclick="closeWidget()" disabled>3. Fechar Modal</button>
-      <button id="btn-inspect" onclick="inspectContainer()" disabled>4. Inspecionar Container</button>
-    </div>
+            <div class="log" id="console"></div>
+        </div>
 
-    <div class="log" id="console"></div>
-  </div>
+        <script>
+            let widgetInitialized = false;
 
-  <script>
-    let widgetInitialized = false;
+            function log(message, type = "info") {
+                const console = document.getElementById("console");
+                const timestamp = new Date().toLocaleTimeString();
+                const entry = document.createElement("div");
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `[${timestamp}] ${message}`;
+                console.appendChild(entry);
+                console.scrollTop = console.scrollHeight;
+            }
 
-    function log(message, type = 'info') {
-      const console = document.getElementById('console');
-      const timestamp = new Date().toLocaleTimeString();
-      const entry = document.createElement('div');
-      entry.className = `log-entry ${type}`;
-      entry.textContent = `[${timestamp}] ${message}`;
-      console.appendChild(entry);
-      console.scrollTop = console.scrollHeight;
-    }
+            async function initWidget() {
+                log("🚀 Inicializando widget...", "info");
+                document.getElementById("btn-init").disabled = true;
 
-    async function initWidget() {
-      log('🚀 Inicializando widget...', 'info');
-      document.getElementById('btn-init').disabled = true;
+                try {
+                    // Carrega o bootstrap do CDN
+                    if (!window.PaymentWidget) {
+                        log("📥 Carregando bootstrap do CDN...", "info");
+                        const script = document.createElement("script");
+                        script.src =
+                            "https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js";
+                        script.async = true;
 
-      try {
-        // Carrega o bootstrap do CDN
-        if (!window.PaymentWidget) {
-          log('📥 Carregando bootstrap do CDN...', 'info');
-          const script = document.createElement('script');
-          script.src = 'https://d2x7cg3k3on9lk.cloudfront.net/widget-bootstrap.v1.min.js';
-          script.async = true;
+                        await new Promise((resolve, reject) => {
+                            script.onload = resolve;
+                            script.onerror = () =>
+                                reject(
+                                    new Error("Falha ao carregar bootstrap"),
+                                );
+                            document.head.appendChild(script);
+                        });
 
-          await new Promise((resolve, reject) => {
-            script.onload = resolve;
-            script.onerror = () => reject(new Error('Falha ao carregar bootstrap'));
-            document.head.appendChild(script);
-          });
+                        log("✅ Bootstrap carregado", "success");
+                    }
 
-          log('✅ Bootstrap carregado', 'success');
-        }
+                    // Inicializa o widget
+                    await window.PaymentWidget.init({
+                        orderId: "test_modal_fix",
+                        environment: "staging",
+                        theme: {
+                            primaryColor: "#2196F3",
+                            secondaryColor: "#4CAF50",
+                        },
+                        onOpen: () => {
+                            log("🔔 Modal aberto (callback)", "success");
+                            document.getElementById("btn-open").disabled = true;
+                            document.getElementById("btn-close").disabled =
+                                false;
+                        },
+                        onClose: () => {
+                            log("🔔 Modal fechado (callback)", "info");
+                            document.getElementById("btn-open").disabled =
+                                false;
+                            document.getElementById("btn-close").disabled =
+                                true;
+                        },
+                        onError: (error) => {
+                            log(`❌ Erro: ${error.message}`, "error");
+                        },
+                    });
 
-        // Inicializa o widget
-        await window.PaymentWidget.init({
-          merchantId: 'test_modal_fix',
-          environment: 'staging',
-          theme: {
-            primaryColor: '#2196F3',
-            secondaryColor: '#4CAF50'
-          },
-          onOpen: () => {
-            log('🔔 Modal aberto (callback)', 'success');
-            document.getElementById('btn-open').disabled = true;
-            document.getElementById('btn-close').disabled = false;
-          },
-          onClose: () => {
-            log('🔔 Modal fechado (callback)', 'info');
-            document.getElementById('btn-open').disabled = false;
-            document.getElementById('btn-close').disabled = true;
-          },
-          onError: (error) => {
-            log(`❌ Erro: ${error.message}`, 'error');
-          }
-        });
+                    widgetInitialized = true;
+                    log("✅ Widget inicializado com sucesso!", "success");
+                    document.getElementById("btn-open").disabled = false;
+                    document.getElementById("btn-inspect").disabled = false;
 
-        widgetInitialized = true;
-        log('✅ Widget inicializado com sucesso!', 'success');
-        document.getElementById('btn-open').disabled = false;
-        document.getElementById('btn-inspect').disabled = false;
+                    // Inspeciona automaticamente após init
+                    setTimeout(() => inspectContainer(), 500);
+                } catch (error) {
+                    log(`❌ Erro na inicialização: ${error.message}`, "error");
+                    document.getElementById("btn-init").disabled = false;
+                }
+            }
 
-        // Inspeciona automaticamente após init
-        setTimeout(() => inspectContainer(), 500);
+            function openWidget() {
+                if (!widgetInitialized) {
+                    log("⚠️ Widget não inicializado", "warning");
+                    return;
+                }
 
-      } catch (error) {
-        log(`❌ Erro na inicialização: ${error.message}`, 'error');
-        document.getElementById('btn-init').disabled = false;
-      }
-    }
+                log("📖 Abrindo modal...", "info");
 
-    function openWidget() {
-      if (!widgetInitialized) {
-        log('⚠️ Widget não inicializado', 'warning');
-        return;
-      }
+                // Verifica estado ANTES de abrir
+                const stateBefore = window.PaymentWidget.getState();
+                log(
+                    `Estado ANTES: isOpen=${stateBefore.isOpen}, isLoaded=${stateBefore.isLoaded}`,
+                    "info",
+                );
 
-      log('📖 Abrindo modal...', 'info');
+                window.PaymentWidget.open();
 
-      // Verifica estado ANTES de abrir
-      const stateBefore = window.PaymentWidget.getState();
-      log(`Estado ANTES: isOpen=${stateBefore.isOpen}, isLoaded=${stateBefore.isLoaded}`, 'info');
+                // Verifica estado DEPOIS de abrir (300ms)
+                setTimeout(() => {
+                    const stateAfter = window.PaymentWidget.getState();
+                    log(
+                        `Estado DEPOIS: isOpen=${stateAfter.isOpen}, isLoaded=${stateAfter.isLoaded}`,
+                        stateAfter.isOpen ? "success" : "warning",
+                    );
 
-      window.PaymentWidget.open();
+                    if (stateAfter.isOpen) {
+                        log("✅ Modal abriu com sucesso!", "success");
+                    } else {
+                        log(
+                            "❌ Modal NÃO abriu (isOpen ainda é false)",
+                            "error",
+                        );
+                    }
 
-      // Verifica estado DEPOIS de abrir (300ms)
-      setTimeout(() => {
-        const stateAfter = window.PaymentWidget.getState();
-        log(`Estado DEPOIS: isOpen=${stateAfter.isOpen}, isLoaded=${stateAfter.isLoaded}`, stateAfter.isOpen ? 'success' : 'warning');
+                    inspectContainer();
+                }, 300);
+            }
 
-        if (stateAfter.isOpen) {
-          log('✅ Modal abriu com sucesso!', 'success');
-        } else {
-          log('❌ Modal NÃO abriu (isOpen ainda é false)', 'error');
-        }
+            function closeWidget() {
+                if (!widgetInitialized) {
+                    log("⚠️ Widget não inicializado", "warning");
+                    return;
+                }
 
-        inspectContainer();
-      }, 300);
-    }
+                log("🚪 Fechando modal...", "info");
+                window.PaymentWidget.close();
 
-    function closeWidget() {
-      if (!widgetInitialized) {
-        log('⚠️ Widget não inicializado', 'warning');
-        return;
-      }
+                // Verifica estado após 300ms
+                setTimeout(() => {
+                    inspectContainer();
+                    const state = window.PaymentWidget.getState();
+                    log(
+                        `Estado: isOpen=${state.isOpen}`,
+                        !state.isOpen ? "success" : "warning",
+                    );
+                }, 300);
+            }
 
-      log('🚪 Fechando modal...', 'info');
-      window.PaymentWidget.close();
+            function inspectContainer() {
+                const container = document.querySelector(
+                    '[id^="__payment_widget_root__"]',
+                );
 
-      // Verifica estado após 300ms
-      setTimeout(() => {
-        inspectContainer();
-        const state = window.PaymentWidget.getState();
-        log(`Estado: isOpen=${state.isOpen}`, !state.isOpen ? 'success' : 'warning');
-      }, 300);
-    }
+                if (!container) {
+                    log("❌ Container não encontrado", "error");
+                    return;
+                }
 
-    function inspectContainer() {
-      const container = document.querySelector('[id^="__payment_widget_root__"]');
+                const styles = window.getComputedStyle(container);
+                log("🔍 Container CSS:", "info");
+                log(`   display: ${styles.display}`, "info");
+                log(`   pointer-events: ${styles.pointerEvents}`, "info");
+                log(`   z-index: ${styles.zIndex}`, "info");
 
-      if (!container) {
-        log('❌ Container não encontrado', 'error');
-        return;
-      }
+                if (container.shadowRoot) {
+                    log("✅ Shadow DOM criado", "success");
+                    const root = container.shadowRoot.getElementById("pw-root");
+                    if (root) {
+                        log(`✅ Root element (#pw-root) encontrado`, "success");
+                        log(`   Children: ${root.children.length}`, "info");
 
-      const styles = window.getComputedStyle(container);
-      log('🔍 Container CSS:', 'info');
-      log(`   display: ${styles.display}`, 'info');
-      log(`   pointer-events: ${styles.pointerEvents}`, 'info');
-      log(`   z-index: ${styles.zIndex}`, 'info');
+                        // Verifica se tem overlay/modal visível
+                        const overlay = root.querySelector(
+                            '[class*="fixed"], [class*="overlay"], [class*="modal"]',
+                        );
+                        if (overlay) {
+                            const overlayStyles =
+                                window.getComputedStyle(overlay);
+                            log(
+                                `   Overlay display: ${overlayStyles.display}`,
+                                "info",
+                            );
+                            log(
+                                `   Overlay opacity: ${overlayStyles.opacity}`,
+                                "info",
+                            );
+                        }
+                    } else {
+                        log("❌ Root element não encontrado", "error");
+                    }
+                } else {
+                    log("⚠️ Shadow DOM não encontrado", "warning");
+                }
+            }
 
-      if (container.shadowRoot) {
-        log('✅ Shadow DOM criado', 'success');
-        const root = container.shadowRoot.getElementById('pw-root');
-        if (root) {
-          log(`✅ Root element (#pw-root) encontrado`, 'success');
-          log(`   Children: ${root.children.length}`, 'info');
-
-          // Verifica se tem overlay/modal visível
-          const overlay = root.querySelector('[class*="fixed"], [class*="overlay"], [class*="modal"]');
-          if (overlay) {
-            const overlayStyles = window.getComputedStyle(overlay);
-            log(`   Overlay display: ${overlayStyles.display}`, 'info');
-            log(`   Overlay opacity: ${overlayStyles.opacity}`, 'info');
-          }
-        } else {
-          log('❌ Root element não encontrado', 'error');
-        }
-      } else {
-        log('⚠️ Shadow DOM não encontrado', 'warning');
-      }
-    }
-
-    // Log inicial
-    log('✅ Página carregada - Clique em "Inicializar Widget"', 'success');
-  </script>
-</body>
-
+            // Log inicial
+            log(
+                '✅ Página carregada - Clique em "Inicializar Widget"',
+                "success",
+            );
+        </script>
+    </body>
 </html>

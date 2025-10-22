@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentScript = document.currentScript;
   if (currentScript) {
     const config = extractConfigFromDataAttributes(currentScript);
-    if (config.merchantId) {
+    if (config.orderId) {
       bootstrap.init(config);
     }
   }
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 ```html
 <script>
   window.PaymentWidgetInit = {
-    merchantId: "merchant_123",
+    orderId: "merchant_123",
     theme: {
       primaryColor: "#FF6B6B",
     },
@@ -88,7 +88,7 @@ O desenvolvedor pode chamar manualmente após carregar o script:
 ```javascript
 // Aguarda o script estar carregado
 await window.PaymentWidget.init({
-  merchantId: "merchant_123",
+  orderId: "merchant_123",
   theme: {
     primaryColor: "#FF6B6B",
     secondaryColor: "#4ECDC4",
@@ -129,7 +129,7 @@ class PaymentWidgetBootstrap {
 ```
 ┌─────────────────────────────────────┐
 │ 1. Validação ✓                      │
-│    └─> Verifica merchantId          │
+│    └─> Verifica orderId          │
 │    └─> Verifica duplicação          │
 └─────────────────────────────────────┘
               ↓
@@ -180,8 +180,8 @@ Suporta múltiplos widgets na mesma página (útil para marketplaces):
 
 ```javascript
 // Inicializa múltiplos merchants
-await PaymentWidget.init({ merchantId: "merchant_1" });
-await PaymentWidget.init({ merchantId: "merchant_2" });
+await PaymentWidget.init({ orderId: "merchant_1" });
+await PaymentWidget.init({ orderId: "merchant_2" });
 
 // Controla cada um independentemente
 PaymentWidget.open("merchant_1"); // Abre o primeiro
@@ -306,7 +306,7 @@ private applyTheme(element: HTMLElement, config: WidgetConfig): void {
 
 ```javascript
 PaymentWidget.init({
-  merchantId: "merchant_123",
+  orderId: "merchant_123",
   logoUrl: "https://minha-empresa.com/logo.png",
   theme: {
     primaryColor: "#FF6B6B", // Vermelho coral
@@ -338,7 +338,7 @@ function extractConfigFromDataAttributes(
   const dataset = script.dataset;
 
   return {
-    merchantId: dataset.merchantId || "",
+    orderId: dataset.orderId || "",
     theme: {
       primaryColor: dataset.primary || dataset.primaryColor,
       secondaryColor: dataset.secondary || dataset.secondaryColor,
@@ -379,13 +379,13 @@ window.PaymentWidget = {
   init: (config: WidgetConfig) => Promise<void>,
 
   // Abre o modal do widget
-  open: (merchantId?: string) => void,
+  open: (orderId?: string) => void,
 
   // Fecha o modal do widget
-  close: (merchantId?: string) => void,
+  close: (orderId?: string) => void,
 
   // Remove completamente o widget do DOM
-  destroy: (merchantId?: string) => void,
+  destroy: (orderId?: string) => void,
 
   // Retorna o estado atual do widget
   getState: () => WidgetState
@@ -397,7 +397,7 @@ window.PaymentWidget = {
 ```javascript
 // 1. Inicializar o widget
 await window.PaymentWidget.init({
-  merchantId: "merchant_123",
+  orderId: "merchant_123",
   environment: "production",
   theme: {
     primaryColor: "#FF6B6B",
@@ -407,7 +407,7 @@ await window.PaymentWidget.init({
   // Callbacks
   onSuccess: (data) => {
     console.log("Pagamento aprovado!", data);
-    // { transactionId, token, merchantId, amount, ... }
+    // { transactionId, token, orderId, amount, ... }
   },
   onError: (error) => {
     console.error("Erro no pagamento:", error);
@@ -581,7 +581,7 @@ const MAX_RETRIES = 50;
 
 ```javascript
 const container = document.createElement("div");
-container.id = `${CONTAINER_ID_PREFIX}${merchantId}`;
+container.id = `${CONTAINER_ID_PREFIX}${orderId}`;
 container.style.cssText = `
   position: fixed;      /* Sempre visível mesmo com scroll */
   top: 0;
@@ -706,11 +706,11 @@ console.log("Estado do widget:", state);
 ### **Problema: "Multiple instances não funcionam"**
 
 ```javascript
-// Especificar merchantId ao abrir/fechar
+// Especificar orderId ao abrir/fechar
 PaymentWidget.open("merchant_1");
 PaymentWidget.close("merchant_1");
 
-// Sem merchantId, usa o primeiro encontrado
+// Sem orderId, usa o primeiro encontrado
 PaymentWidget.open(); // Abre primeiro merchant
 ```
 
@@ -729,11 +729,11 @@ PaymentWidget.open(); // Abre primeiro merchant
 
 O **Bootstrap Loader** é essencialmente o **"gerente de carga"** do widget:
 
-✅ Carrega o widget pesado apenas quando necessário  
-✅ Isola estilos para evitar conflitos  
-✅ Aplica temas personalizados dinamicamente  
-✅ Expõe API simples para desenvolvedores  
-✅ Suporta múltiplas instâncias  
+✅ Carrega o widget pesado apenas quando necessário
+✅ Isola estilos para evitar conflitos
+✅ Aplica temas personalizados dinamicamente
+✅ Expõe API simples para desenvolvedores
+✅ Suporta múltiplas instâncias
 ✅ Otimizado para performance e cache
 
 Esta arquitetura permite que o widget seja **leve, rápido e flexível**, mantendo uma **excelente experiência de desenvolvedor (DX)** e **performance para o usuário final (UX)**.
